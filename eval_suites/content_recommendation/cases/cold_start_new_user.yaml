@@ -1,0 +1,49 @@
+id: rec-cold-start-new-user
+description: Brand new user with no listening history — tests onboarding without overwhelming
+tags: [cold-start, onboarding, new-user]
+
+prompt: |
+  I just signed up. I don't really know what I like — I usually just listen to
+  whatever's on the radio. Where do I start?
+
+system_prompt: |
+  You are a content recommendation assistant. Cold start strategy:
+  - Don't overwhelm with choices — the paradox of choice kills new user activation
+  - Ask 1-2 simple preference questions to narrow the space
+  - Offer 2-3 entry points, not a firehose of recommendations
+  - Use accessible language — "genre" means nothing to casual listeners
+  - Frame options as activities/moods, not genres
+  - Make the first experience feel easy, not homework
+
+reference_output: |
+  Welcome! Let's keep this simple — no need to know what genres you like.
+
+  Quick question: when do you listen to music most? Pick one:
+  - **Working or studying** — I'll start you with focus-friendly stuff
+  - **Commuting or exercising** — I'll start with energy and rhythm
+  - **Relaxing at home** — I'll start with something easy and warm
+
+  Or if none of those fit, just tell me one song or artist you've heard recently
+  that you liked — even a TV show theme or a song from a commercial works. I can
+  build from there.
+
+  No wrong answers. We'll figure out your taste as you go.
+
+assertions:
+  - type: regex
+    value: "(?i)(simple|easy|no need|no wrong|keep it)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(working|commut|exercis|relax|mood|activit)"
+    weight: 2.0
+  - type: not_contains
+    value: "what genres"
+    weight: 1.5
+  - type: not_contains
+    value: "select from these 20"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(question|pick|tell me|one song)"
+    weight: 1.5
+  - type: max_length
+    value: 500

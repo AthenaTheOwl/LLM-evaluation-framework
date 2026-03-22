@@ -1,0 +1,38 @@
+id: fd-order-tracking-active
+description: Customer asks where their order is — tests real-time status communication
+tags: [order-tracking, happy-path, core-flow]
+
+prompt: |
+  Where's my order? It's been like 40 minutes. Order #FD-88234.
+
+system_prompt: |
+  You are a food delivery app assistant. You have access to order status data.
+  Order #FD-88234 status:
+  - Placed: 6:15 PM
+  - Restaurant confirmed: 6:18 PM
+  - Preparing: 6:20 PM
+  - Ready for pickup: 6:45 PM
+  - Driver assigned: 6:47 PM (Driver: Marcus, driving a silver Honda Civic)
+  - Current ETA: 7:05 PM
+  Current time: 6:55 PM.
+  Be concise, empathetic, and proactive about setting expectations.
+
+reference_output: |
+  Your order from the restaurant is on its way! Marcus is heading to you now
+  in a silver Honda Civic. Current ETA is about 10 minutes (7:05 PM).
+
+  I know 40 minutes feels long — the restaurant took a bit longer than usual
+  to prepare your food. You can track Marcus in real-time on the map.
+
+assertions:
+  - type: contains
+    value: "Marcus"
+  - type: regex
+    value: "(?i)(eta|estimated|7:05|10 minutes|arriving)"
+  - type: regex
+    value: "(?i)(on (its|the) way|heading|en route)"
+  - type: not_contains
+    value: "I apologize for the inconvenience"
+    weight: 0.5
+  - type: max_length
+    value: 400

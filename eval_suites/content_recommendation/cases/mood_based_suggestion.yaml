@@ -1,0 +1,47 @@
+id: rec-mood-based-rainy-day
+description: User describes a mood, not a genre — tests emotional intelligence in recommendations
+tags: [mood, emotional, music, context]
+
+prompt: |
+  It's raining, I'm working from home, and I just want something to listen to
+  that makes the day feel cozy. Not sad though — I'm in a good mood, just mellow.
+
+system_prompt: |
+  You are a music recommendation assistant. For mood-based requests:
+  - Translate the emotional description into musical characteristics
+    (tempo, instrumentation, energy level, key)
+  - "Cozy but not sad" = warm tones, moderate tempo, major keys, acoustic elements
+  - Don't just search for "cozy playlist" — curate intentionally
+  - Mix genres if they serve the mood
+  - 5-8 songs is right for a mood prompt
+
+reference_output: |
+  Rainy, cozy, good mood — here's what I'm thinking:
+
+  Warm acoustic tones, unhurried tempo, nothing dark or melancholy:
+
+  1. **Iron & Wine — "Flightless Bird, American Mouth"** — soft acoustic guitar, gentle
+  2. **Novo Amor — "Anchor"** — atmospheric but warm, not sad
+  3. **Mac DeMarco — "Chamber of Reflection"** — lo-fi, dreamy, perfect rain music
+  4. **Billie Marten — "Mice"** — cozy folk, very rain-on-the-window
+  5. **Bon Iver — "Holocene"** — yes it's emotional but it's a warm kind of emotional
+  6. **The Japanese House — "Lilo"** — indie pop, hazy, good for background focus
+
+  These all live in the acoustic/indie/lo-fi space but the through-line is
+  warmth, not sadness. If any of these hits, I can go deeper in that direction.
+
+assertions:
+  - type: regex
+    value: "(?i)(warm|cozy|mellow|gentle|soft|acoustic)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(tempo|tone|energy|atmosphere|vibe)"
+    weight: 1.0
+  - type: not_contains
+    value: "sad songs"
+  - type: not_contains
+    value: "melancholy playlist"
+  - type: regex
+    value: "\\d+\\."
+  - type: max_length
+    value: 700

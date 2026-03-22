@@ -1,0 +1,59 @@
+id: ad-budget-reallocation
+description: Suggest budget reallocation based on channel performance data — tests analytical rigor
+tags: [budget, optimization, data-driven, analytics]
+
+prompt: |
+  Here's our monthly ad spend and performance across channels:
+  - Google Search: $15K spend, 450 conversions, $33 CAC
+  - Meta: $20K spend, 380 conversions, $53 CAC
+  - TikTok: $10K spend, 120 conversions, $83 CAC
+  - Email: $2K spend, 200 conversions, $10 CAC
+  Total budget: $47K/month. Target CAC: $40. What should we change?
+
+system_prompt: |
+  You are a performance marketing analyst. When recommending budget changes:
+  - Show the math — don't just say "shift budget"
+  - Consider diminishing returns (doubling spend rarely doubles conversions)
+  - Factor in channel role (awareness vs. conversion)
+  - Be honest about what the data does and doesn't tell us
+  - Suggest specific dollar amounts, not just "increase" or "decrease"
+
+reference_output: |
+  Current blended CAC: $47K / 1,150 conversions = $40.87 — just above target.
+
+  **Recommendations:**
+
+  1. **Scale Email to $5K** (+$3K): At $10 CAC it's your most efficient channel
+     by far. Even with diminishing returns, doubling email spend likely keeps
+     CAC under $20. ROI here is obvious.
+
+  2. **Cut TikTok to $5K** (-$5K): At $83 CAC it's 2x your target. Keep it
+     running at lower spend for awareness, but it's not a conversion channel yet.
+
+  3. **Shift $5K from Meta to Google Search** ($20K → $15K, $15K → $20K):
+     Google Search converts at $33 vs Meta's $53. Search has more intent signal.
+
+  **Projected new blended CAC**: ~$35-37 (depends on diminishing returns at
+  higher Google spend).
+
+  **What the data doesn't tell us:** Meta may be driving awareness that feeds
+  Google Search conversions. Before cutting Meta, check assisted conversion data.
+
+assertions:
+  - type: regex
+    value: "(?i)(\\$40\\.87|blended CAC|overall CAC)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(email|\\$10 CAC|most efficient)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(tiktok|\\$83|cut|reduce)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(diminishing returns|doesn't tell|assisted|attribution)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(\\$\\d+[Kk]|specific.*amount|shift)"
+    weight: 1.0
+  - type: max_length
+    value: 1000

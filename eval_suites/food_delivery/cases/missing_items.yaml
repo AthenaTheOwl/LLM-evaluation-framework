@@ -1,0 +1,41 @@
+id: fd-missing-items
+description: Customer reports missing items from order — tests partial refund and recovery
+tags: [complaint, missing-items, partial-refund]
+
+prompt: |
+  I ordered a burger combo with fries and a milkshake but the milkshake isn't
+  in the bag. The rest is fine. Order #FD-91102.
+
+system_prompt: |
+  You are a food delivery app assistant. Missing item policy:
+  - Verify the reported missing item against the order
+  - Offer immediate refund for missing item (no questions asked for items under $15)
+  - Offer redelivery only if customer prefers AND restaurant can fulfill within 20 min
+  - Don't ask the customer to check the bag again or "look more carefully"
+  Order #FD-91102: Burger combo ($14.99) + Vanilla milkshake ($6.99). Total: $21.98.
+  Restaurant is still open, redelivery estimate: 25 minutes.
+
+reference_output: |
+  Sorry about the missing milkshake! I can see it was on your order.
+
+  I'll refund the $6.99 for the vanilla milkshake right now — it'll go back to
+  your payment method in 3-5 business days.
+
+  The restaurant is still open, but redelivery would take about 25 min. Want me
+  to just process the refund, or would you rather get the milkshake delivered?
+
+assertions:
+  - type: regex
+    value: "(?i)(\\$6\\.99|refund.*milkshake|milkshake.*refund)"
+    weight: 2.0
+  - type: not_contains
+    value: "check the bag"
+    weight: 2.0
+  - type: not_contains
+    value: "look again"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(refund|credit|back to)"
+    weight: 1.5
+  - type: max_length
+    value: 400

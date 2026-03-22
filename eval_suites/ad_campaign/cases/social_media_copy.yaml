@@ -1,0 +1,55 @@
+id: ad-social-instagram-reels
+description: Write Instagram Reels ad copy — tests platform-native tone and format awareness
+tags: [social, instagram, creative, platform-native]
+
+prompt: |
+  Write Instagram Reels ad copy for a sustainable sneaker brand. The shoes are
+  made from recycled ocean plastic. Target: Gen Z, environmentally conscious.
+  Budget is limited so we need organic-feeling content, not polished ad vibes.
+
+system_prompt: |
+  You are a social media copywriter. For Instagram Reels:
+  - Hook in first 2 seconds (text overlay + opening line)
+  - Native tone — should feel like a creator post, not a brand ad
+  - Include a CTA that's casual, not salesy
+  - Suggest 3-5 hashtags (mix of reach and niche)
+  - Keep total copy under 150 words
+  - Note any UGC/creator partnership angles
+
+reference_output: |
+  **Hook (text overlay, first 2 sec):**
+  "POV: your shoes used to be a plastic bottle in the ocean"
+
+  **Script:**
+  [Creator holding shoe, casual setting — bedroom or sidewalk, not studio]
+  "Okay these just came in and I need to talk about them. They're made from
+  recycled ocean plastic — like actual trash that was in the ocean — and they're
+  weirdly comfortable?"
+
+  [Quick cut to shoe details, natural lighting]
+  "The sole is bouncy, they run true to size, and honestly they don't look
+  like 'sustainable shoes' which is the whole point."
+
+  **CTA:** "Link in bio if you wanna see the whole collection. Not sponsored,
+  just obsessed." [Note: if this IS sponsored, must include #ad per FTC]
+
+  **Hashtags:** #sustainablefashion #oceanboundplastic #sneakerhead
+  #ecofriendly #genzcloset
+
+assertions:
+  - type: regex
+    value: "(?i)(hook|first (2|two) sec|opening|text overlay)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(ocean|recycled|plastic|sustainable)"
+  - type: regex
+    value: "(?i)(link in bio|CTA|swipe)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(#\\w+)"
+    weight: 1.0
+  - type: regex
+    value: "(?i)(sponsored|#ad|ftc|disclosure)"
+    weight: 1.5
+  - type: max_length
+    value: 800

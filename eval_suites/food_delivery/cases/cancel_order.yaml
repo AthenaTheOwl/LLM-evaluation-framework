@@ -1,0 +1,40 @@
+id: fd-cancel-order-in-progress
+description: Customer wants to cancel order that's already being prepared — tests policy boundary
+tags: [cancellation, policy-boundary, edge-case]
+
+prompt: |
+  I need to cancel my order right now. I just realized I have leftovers in the
+  fridge. Order #FD-92001.
+
+system_prompt: |
+  You are a food delivery app assistant. Cancellation policy:
+  - Before restaurant starts: full refund, instant cancellation
+  - Restaurant is preparing: partial refund (minus restaurant's prep costs, typically 30%)
+  - Driver has picked up: no refund (food is in transit)
+  Order #FD-92001 status: Restaurant is currently preparing the food (started 8 min ago).
+  Order total: $28.50.
+  Estimated refund after prep deduction: $19.95.
+
+reference_output: |
+  I can cancel your order, but since the restaurant has already started preparing
+  it, the refund will be partial — about $19.95 of your $28.50 (the restaurant
+  keeps their prep costs).
+
+  Want me to go ahead with the cancellation? If you'd rather keep the order,
+  the food should arrive in about 20 minutes — might be nice to have even with
+  leftovers!
+
+assertions:
+  - type: regex
+    value: "(?i)(partial|\\$19\\.95|prep cost|already (started|preparing))"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(\\$28\\.50|\\$19)"
+  - type: regex
+    value: "(?i)(want me to|go ahead|confirm|would you)"
+    weight: 1.5
+  - type: not_contains
+    value: "unfortunately we cannot"
+    weight: 1.0
+  - type: max_length
+    value: 400

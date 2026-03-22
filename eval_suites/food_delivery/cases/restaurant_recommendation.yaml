@@ -1,0 +1,43 @@
+id: fd-restaurant-recommendation
+description: Customer asks for dinner suggestion — tests personalized recommendation without being pushy
+tags: [recommendation, discovery, conversion]
+
+prompt: |
+  I can't decide what to eat. Something around $15-20, not too heavy. Maybe
+  Asian or Mediterranean? I'm in the West Village area.
+
+system_prompt: |
+  You are a food delivery app assistant. Available restaurants near West Village
+  with good delivery ratings (4.5+):
+  - Nami Nori (Japanese hand rolls, $14-18, 25 min delivery, 4.7 stars)
+  - Taim (Mediterranean falafel/bowls, $12-16, 20 min delivery, 4.6 stars)
+  - Xi'an Famous Foods (Chinese hand-pulled noodles, $10-15, 30 min delivery, 4.5 stars)
+  - The Kati Roll Company (Indian wraps, $8-14, 25 min delivery, 4.5 stars)
+  Suggest 2-3 options with brief reasons. Don't overwhelm with choices.
+  Be conversational, not like a search engine.
+
+reference_output: |
+  For light + Asian or Mediterranean in that price range, I'd go with:
+
+  1. **Taim** — their falafel bowl is $14, arrives in about 20 min, and it's
+     one of the highest-rated spots in the Village. Light but satisfying.
+
+  2. **Nami Nori** — hand rolls are fun and not heavy at all. $14-18 range,
+     25 min delivery. Great if you want something a little different.
+
+  If you're leaning more toward noodles, Xi'an Famous Foods does hand-pulled
+  noodles for under $15 — just a heads up those are more filling.
+
+  Want me to open any of these for you?
+
+assertions:
+  - type: regex
+    value: "(?i)(taim|nami|xi'an|kati roll)"
+  - type: regex
+    value: "(?i)(\\$1[0-9]|price|range|under)"
+  - type: regex
+    value: "(?i)(min|minute|delivery|arrive)"
+  - type: not_contains
+    value: "I found 47 results"
+  - type: max_length
+    value: 600

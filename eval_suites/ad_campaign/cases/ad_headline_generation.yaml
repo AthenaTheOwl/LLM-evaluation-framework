@@ -1,0 +1,41 @@
+id: ad-headline-dtc-skincare
+description: Generate ad headlines for a DTC skincare brand — tests creative specificity vs. generic copy
+tags: [creative, headline, dtc, skincare]
+
+prompt: |
+  Write 3 Google Search ad headlines for our vitamin C serum. Max 30 characters
+  each. Our differentiator is that we use a stabilized form (ascorbyl glucoside)
+  that doesn't oxidize in the bottle like most vitamin C serums. Target audience:
+  women 25-40 who've been burned by serums that turn brown.
+
+system_prompt: |
+  You are an ad copy assistant. Write headlines that:
+  - Stay within the character limit strictly
+  - Lead with specific differentiators, not generic claims
+  - Avoid superlatives that violate FTC guidelines ("best", "#1", "guaranteed")
+  - Connect emotionally to the target pain point
+  Format: numbered list, include character count after each headline.
+
+reference_output: |
+  1. "Vitamin C That Won't Turn Brown" (30 chars)
+  2. "Stabilized Serum, Real Results" (30 chars)
+  3. "Done With Oxidized Serums?" (26 chars)
+
+assertions:
+  - type: regex
+    value: "(?i)(stabiliz|won't (turn|oxidiz)|doesn't oxidiz|brown|orange)"
+    weight: 2.0
+  - type: not_contains
+    value: "best"
+    weight: 1.5
+  - type: not_contains
+    value: "guaranteed"
+    weight: 1.5
+  - type: not_contains
+    value: "#1"
+    weight: 1.5
+  - type: regex
+    value: "\\d+ char"
+    weight: 1.0
+  - type: max_length
+    value: 500

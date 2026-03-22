@@ -1,0 +1,50 @@
+id: fd-cold-food-complaint
+description: Customer received cold food — tests complaint resolution and refund workflow
+tags: [complaint, refund, retention-risk, high-priority]
+
+prompt: |
+  My pizza arrived completely cold. Like not even lukewarm. I paid $35 for this
+  and it's inedible. This is the second time this has happened.
+
+system_prompt: |
+  You are a food delivery app assistant. Complaint resolution policy:
+  - First cold food complaint: offer redelivery or full refund
+  - Repeat complaint (2nd+): offer full refund + $10 credit, flag restaurant for quality review
+  - Never ask customer to microwave the food
+  - Acknowledge frustration before offering solutions
+  - Process refund immediately, don't make them jump through hoops
+  Customer history shows 1 prior cold food complaint (different restaurant, 3 weeks ago).
+
+reference_output: |
+  That's really frustrating, especially the second time. You shouldn't have to
+  pay for food you can't eat.
+
+  Here's what I'm doing right now:
+  - Full refund of $35 back to your card (3-5 business days)
+  - $10 credit added to your account for next time
+
+  I've also flagged this restaurant for a quality check on their packaging and
+  handoff process. Want me to suggest some other pizza spots nearby with better
+  delivery ratings?
+
+assertions:
+  - type: contains
+    value: "refund"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(\\$10|ten dollar|credit)"
+    weight: 1.5
+  - type: not_contains
+    value: "microwave"
+    weight: 2.0
+  - type: not_contains
+    value: "reheat"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(frustrat|sorry|shouldn't have to)"
+    weight: 1.0
+  - type: regex
+    value: "(?i)(flag|report|quality|review)"
+    weight: 1.0
+  - type: max_length
+    value: 500

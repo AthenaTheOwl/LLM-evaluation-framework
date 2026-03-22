@@ -1,0 +1,59 @@
+id: ad-competitor-positioning
+description: Position against a competitor without making unsubstantiated claims — legal minefield
+tags: [competitive, positioning, legal, claims]
+
+prompt: |
+  We're a project management tool competing with Asana. Our main advantage is
+  that we have built-in time tracking (Asana requires a third-party integration).
+  Write a comparison landing page section. We can't afford legal trouble.
+
+system_prompt: |
+  You are an ad copy assistant. For competitive positioning:
+  - Only state factually verifiable differences
+  - Don't use subjective claims ("better", "easier") as if they're facts
+  - Cite specific features, not vague superiority
+  - Never disparage the competitor — focus on your strengths
+  - Add a "last verified" date for any competitor claims
+  - Recommend legal review disclaimer
+
+reference_output: |
+  **Built-in Time Tracking. No Integrations Needed.**
+
+  Unlike tools that require third-party add-ons for time tracking, [ProductName]
+  includes it natively. That means:
+
+  - Track time directly on tasks — no switching apps
+  - Time data flows into your project reports automatically
+  - No extra subscription for a time tracking tool
+
+  | Feature | [ProductName] | Asana |
+  |---------|--------------|-------|
+  | Built-in time tracking | Yes | Requires integration (e.g., Toggl, Harvest) |
+  | Time → reporting | Automatic | Manual export/sync |
+
+  *Competitor information verified as of [date]. Features may change.
+  Visit asana.com for current details.*
+
+  NOTE: Recommend legal review before publishing any competitive comparison.
+
+assertions:
+  - type: regex
+    value: "(?i)(time tracking|built.?in|native)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(integration|third.?party|add.?on|toggl|harvest)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(verified|current|date|may change)"
+    weight: 2.0
+  - type: not_contains
+    value: "Asana is bad"
+    weight: 2.0
+  - type: not_contains
+    value: "Asana sucks"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(legal|review|disclaimer)"
+    weight: 1.5
+  - type: max_length
+    value: 800

@@ -1,0 +1,52 @@
+id: ad-audience-fitness-app
+description: Define audience segments for a fitness app — tests specificity and platform awareness
+tags: [targeting, audience, segmentation]
+
+prompt: |
+  We're launching a meditation + fitness app. Budget is $50K/month for paid social.
+  We've seen strong organic traction with two groups: new moms returning to
+  fitness and tech workers dealing with burnout. Help me define the targeting
+  for Meta and TikTok campaigns.
+
+system_prompt: |
+  You are a paid social strategist. When defining audiences:
+  - Be specific about platform-native targeting options (Meta interests vs. TikTok behavior)
+  - Segment clearly — don't lump different audiences together
+  - Consider lookalike/custom audience strategies
+  - Note any targeting restrictions (e.g., Meta's Special Ad Categories)
+  - Suggest budget split with reasoning
+
+reference_output: |
+  **Segment 1: New Moms (Postpartum Fitness)**
+  - Meta: Interest targeting (parenting, postpartum, baby gear) + age 25-38
+  - TikTok: #postpartumfitness, #momlife content viewers
+  - Lookalike: seed from organic users in this segment
+  - Budget: 60% ($30K) — higher intent, lower CPMs on Meta for parenting
+
+  **Segment 2: Tech Workers (Burnout Recovery)**
+  - Meta: Job title targeting (software engineer, product manager) + interest in meditation
+  - TikTok: #tecktok, #corporatelife viewers, 25-45
+  - Budget: 40% ($20K) — higher CPMs but higher LTV
+
+  **Platform split**: 65% Meta / 35% TikTok for both segments. Meta for
+  conversion, TikTok for awareness and top-of-funnel.
+
+assertions:
+  - type: regex
+    value: "(?i)(new mom|postpartum|parenting)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(tech worker|burnout|engineer|developer)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(meta|facebook|instagram)"
+  - type: regex
+    value: "(?i)(tiktok)"
+  - type: regex
+    value: "(?i)(budget|split|\\$|allocation)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(lookalike|custom audience|seed)"
+    weight: 1.0
+  - type: max_length
+    value: 1000

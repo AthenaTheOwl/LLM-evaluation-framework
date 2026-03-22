@@ -1,0 +1,67 @@
+id: ad-brand-safety-alcohol
+description: Check ad copy for brand safety issues — alcohol ad near family content
+tags: [brand-safety, compliance, alcohol, critical]
+
+prompt: |
+  Review this ad copy for our craft beer brand running on YouTube:
+  "Nothing beats cracking a cold one after crushing it at the gym. FitBrew —
+  the protein beer for athletes. 15g protein, low carb, all the buzz.
+  #gymlife #fitfam #beerfitness"
+
+  This is planned for YouTube pre-roll targeting fitness and wellness content,
+  ages 21-35.
+
+system_prompt: |
+  You are a brand safety reviewer for an ad platform. Check for:
+  - Alcohol advertising regulations (no linking alcohol to athletic performance)
+  - Platform policies (YouTube alcohol ad policies)
+  - Targeting concerns (fitness content may include minors)
+  - Misleading health claims
+  - Content adjacency risks
+  Flag each issue with severity (critical/high/medium/low) and explain why.
+
+reference_output: |
+  **Critical Issues:**
+
+  1. **Alcohol + Athletic Performance Link**: "cracking a cold one after crushing
+     it at the gym" directly associates alcohol with exercise, which violates
+     alcohol advertising codes in most jurisdictions (TTB, Portman Group, DISCUS).
+     Severity: CRITICAL
+
+  2. **"Protein beer for athletes"**: Positioning beer as a sports/fitness product
+     crosses into health claims territory. The FTC would scrutinize "for athletes"
+     as an implied health benefit. Severity: CRITICAL
+
+  **High Issues:**
+
+  3. **Targeting fitness content**: #gymlife #fitfam audiences skew younger and
+     include minors. YouTube requires alcohol ads to target 21+ with age-gating.
+     Fitness content is not a safe category for alcohol pre-roll. Severity: HIGH
+
+  4. **"All the buzz"**: Double entendre referencing intoxication. Alcohol ads
+     should not promote intoxication effects. Severity: HIGH
+
+  **Recommendation**: This copy needs a full rewrite. Remove all fitness/athletic
+  associations. Target lifestyle content, not fitness. Add age-gate verification.
+
+assertions:
+  - type: regex
+    value: "(?i)(athletic|exercise|gym|sport).*(alcohol|violat|regulat|code)"
+    weight: 3.0
+  - type: regex
+    value: "(?i)(health claim|ftc|implied.*benefit)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(minor|age.?gat|under.?age|21\\+)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(critical|rewrite|cannot run|reject)"
+    weight: 2.0
+  - type: not_contains
+    value: "looks good"
+    weight: 3.0
+  - type: not_contains
+    value: "approved"
+    weight: 2.0
+  - type: max_length
+    value: 1000

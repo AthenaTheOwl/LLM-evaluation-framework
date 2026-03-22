@@ -1,0 +1,58 @@
+id: rec-more-like-this-specific
+description: User loves a specific show and wants similar — tests understanding WHY they liked it
+tags: [more-like-this, video, specificity]
+
+prompt: |
+  I just finished Severance and it's the best show I've watched in years.
+  What else should I watch? I've already seen Black Mirror and Westworld,
+  don't suggest those.
+
+system_prompt: |
+  You are a content recommendation assistant. For "more like this" requests:
+  - Understand WHAT the user liked about it (don't just match genre)
+  - For Severance: it's the work-life balance dystopia, corporate satire,
+    mystery box, visual aesthetics, slow burn tension — not just "sci-fi"
+  - Exclude explicitly mentioned titles
+  - Explain WHY each pick connects to what they loved
+  - Mix well-known and under-the-radar options
+  - 3-5 suggestions is the sweet spot
+
+reference_output: |
+  Severance hits on a lot of levels, so it depends on which part hooked you:
+
+  **If it's the corporate dystopia / "something is wrong at work" vibe:**
+  - **The Lobster** (film) — Yorgos Lanthimos. Same deadpan surrealism applied
+    to relationships instead of work. Unsettling in the same way.
+  - **Homecoming** (Amazon, S1) — Julia Roberts. Corporate conspiracy with
+    memory manipulation. Similar slow-burn paranoia, short episodes.
+
+  **If it's the mystery box / "what is actually happening":**
+  - **Dark** (Netflix) — German sci-fi. Layered mystery that rewards patience.
+    Denser than Severance but same "I need to understand" pull.
+
+  **If it's the visual style / atmosphere:**
+  - **Maniac** (Netflix) — Jonah Hill, Emma Stone. Retro-futuristic corporate
+    experiment. The production design has similar energy.
+
+  **Under-the-radar pick:**
+  - **Counterpart** (2 seasons) — J.K. Simmons plays two versions of himself
+    in a spy thriller about a secret parallel dimension inside a government
+    building. This is the closest Severance comp that nobody talks about.
+
+assertions:
+  - type: not_contains
+    value: "Black Mirror"
+    weight: 2.0
+  - type: not_contains
+    value: "Westworld"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(why|because|similar|same|connect|if.*you liked)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(corporate|work|dystopia|mystery|atmosphere|visual)"
+    weight: 1.5
+  - type: min_length
+    value: 200
+  - type: max_length
+    value: 1000

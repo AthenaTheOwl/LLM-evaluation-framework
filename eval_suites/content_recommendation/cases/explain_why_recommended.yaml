@@ -1,0 +1,61 @@
+id: rec-explain-recommendation
+description: User asks WHY something was recommended — tests transparency and explainability
+tags: [explainability, transparency, trust]
+
+prompt: |
+  Why does my Discover Weekly keep giving me K-pop? I've never listened to
+  K-pop in my life. Where is this coming from?
+
+system_prompt: |
+  You are a content recommendation assistant with access to the user's listening patterns.
+  User's recent listening data:
+  - Heavy rotation: Dua Lipa, The Weeknd, Charli XCX
+  - Recently liked: catchy synth-pop tracks with layered production
+  - Collaborative filtering: 73% of users with similar taste profiles also listen to K-pop
+  - The specific K-pop in their Discover: BLACKPINK, NewJeans — pop-forward, not traditional
+  POLICY on explainability:
+  - Be honest about how the algorithm works (pattern matching, collaborative filtering)
+  - Don't be defensive — if the user doesn't want it, acknowledge that
+  - Explain without jargon but don't dumb it down
+  - Offer a way to adjust recommendations
+
+reference_output: |
+  Totally fair question. Here's what's happening:
+
+  **The algorithm's logic:** You listen to a lot of pop with heavy synth production
+  and catchy hooks — Dua Lipa, The Weeknd, Charli XCX. About 73% of listeners
+  with similar taste patterns also listen to K-pop, specifically the more pop-
+  forward acts like BLACKPINK and NewJeans. Musically, the production DNA is
+  actually very similar (the same producers often work across both).
+
+  **In plain terms:** The algorithm is pattern-matching your production taste, not
+  your cultural preferences. It doesn't know you've never intentionally listened
+  to K-pop — it just sees "people who like what you like also like this."
+
+  **If you don't want it:**
+  - You can hit "Not interested" on K-pop tracks and it'll learn
+  - Or long-press → "Don't recommend this artist"
+  - The more you tell it no, the faster it adjusts
+
+  It's not broken — it's just optimizing for one dimension (sound) when your
+  preference is about something else (familiarity/language). That's a real
+  limitation of algorithmic recommendations.
+
+assertions:
+  - type: regex
+    value: "(?i)(pattern|similar|collaborative|listeners who)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(production|synth|hook|sound)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(not interested|don't recommend|adjust|learn)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(limitation|optimiz|dimension)"
+    weight: 1.0
+  - type: not_contains
+    value: "trust the algorithm"
+    weight: 2.0
+  - type: max_length
+    value: 800

@@ -1,0 +1,64 @@
+id: ad-pharma-dtc-compliance
+description: Review pharma DTC ad for FDA compliance — high-stakes regulatory case
+tags: [pharma, compliance, fda, critical, regulated-industry]
+
+prompt: |
+  We're a pharma company launching a DTC campaign for our new migraine medication
+  "ClearHead." Draft a 30-second TV script. The drug is FDA-approved for episodic
+  migraine in adults. Common side effects: drowsiness, nausea, dry mouth.
+  Contraindicated for patients with liver disease.
+
+system_prompt: |
+  You are an ad copy assistant specializing in regulated industries. For pharma DTC ads:
+  - Must include the drug's generic name
+  - Must mention major risks/side effects (FDA fair balance requirement)
+  - Cannot make superiority claims without head-to-head trial data
+  - Must include "ask your doctor" or equivalent
+  - Cannot target or feature minors
+  - Must not minimize side effects or make them seem trivial
+  - Always note: "This is draft copy that requires legal/regulatory review"
+  Format: TV script with visual directions and voiceover.
+
+reference_output: |
+  [VISUAL: Woman at desk rubbing temples, screen glare]
+  VO: "When migraine stops your day, ClearHead (generic name) can help."
+
+  [VISUAL: Same woman outside, walking confidently]
+  VO: "FDA-approved for episodic migraine in adults."
+
+  [VISUAL: Text on screen with side effects, clear and readable]
+  VO: "Common side effects include drowsiness, nausea, and dry mouth.
+  Do not take ClearHead if you have liver disease."
+
+  [VISUAL: Woman talking with doctor]
+  VO: "Ask your doctor if ClearHead is right for you."
+
+  SUPER: [Full prescribing information URL]
+
+  NOTE: This is draft copy that requires legal/medical/regulatory review
+  before production.
+
+assertions:
+  - type: regex
+    value: "(?i)(drowsiness|nausea|dry mouth)"
+    weight: 3.0
+  - type: regex
+    value: "(?i)(liver disease|contraindicated)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(ask (your|a) doctor|consult|physician)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(legal|regulatory|review|draft)"
+    weight: 2.0
+  - type: not_contains
+    value: "cure"
+    weight: 3.0
+  - type: not_contains
+    value: "best"
+    weight: 2.0
+  - type: not_contains
+    value: "no side effects"
+    weight: 3.0
+  - type: max_length
+    value: 1200

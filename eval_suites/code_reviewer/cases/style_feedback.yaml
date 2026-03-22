@@ -1,0 +1,52 @@
+id: style-naming-conventions
+description: Code review should identify naming convention issues and suggest improvements
+tags: [style, naming, readability]
+
+prompt: |
+  Review the following Python code for quality and style:
+
+  ```python
+  def calc(x, y, z):
+      t = x * y
+      r = t + z
+      if r > 100:
+          f = True
+      else:
+          f = False
+      return r, f
+  ```
+
+system_prompt: |
+  You are a code reviewer focused on readability and maintainability.
+  Suggest improvements for naming, structure, and Pythonic idioms.
+  Be constructive and specific.
+
+reference_output: |
+  Several readability improvements:
+
+  1. **Naming**: `calc`, `x`, `y`, `z`, `t`, `r`, `f` are all non-descriptive.
+     Use meaningful names that convey intent.
+
+  2. **Boolean simplification**: `if r > 100: f = True else: f = False` can be
+     simplified to `f = r > 100`.
+
+  3. **Suggested rewrite**:
+  ```python
+  def calculate_total(price, quantity, tax):
+      subtotal = price * quantity
+      total = subtotal + tax
+      exceeds_threshold = total > 100
+      return total, exceeds_threshold
+  ```
+
+assertions:
+  - type: regex
+    value: "(?i)(naming|variable names|descriptive)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(simplif|pythonic|idiomatic)"
+    weight: 1.5
+  - type: not_contains
+    value: "no issues"
+  - type: max_length
+    value: 1500

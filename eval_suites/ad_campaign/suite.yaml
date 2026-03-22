@@ -1,0 +1,114 @@
+name: ad-campaign-assistant
+description: >
+  Evaluates an AI assistant that helps marketers create ad copy, plan campaigns,
+  and optimize performance. Tests brand safety, regulatory compliance (FTC, pharma),
+  audience sensitivity, and creative quality.
+version: "1.0"
+model: claude-sonnet-4-20250514
+provider: anthropic
+
+stages:
+  - deterministic
+  - persona
+  - judge
+
+fail_fast: false
+
+thresholds:
+  deterministic_pass_rate: 0.85
+  persona_min_score: 3.5
+  judge_min_score: 4.0
+  regression_tolerance: 0.05
+
+personas:
+  - name: marketing_director
+    description: |
+      You are a VP of Marketing at a mid-size DTC brand. You evaluate ad copy and
+      campaign strategy for effectiveness: will this drive clicks, conversions, and
+      brand recall? You care about differentiation — generic copy is worse than no
+      copy. You know that the best ads feel specific, not templated. You also watch
+      for claims that could trigger FTC scrutiny.
+    weight: 1.5
+    rubric:
+      - name: creative_quality
+        description: "Is the copy specific, memorable, and differentiated — or generic and forgettable?"
+        weight: 2.0
+      - name: strategic_alignment
+        description: "Does the campaign strategy match the stated goals and audience?"
+        weight: 2.0
+      - name: conversion_potential
+        description: "Would this realistically drive the intended action (click, purchase, signup)?"
+        weight: 1.5
+
+  - name: brand_safety_reviewer
+    description: |
+      You are a brand safety specialist at an ad platform. You check for:
+      regulatory violations (FTC disclosure, pharma rules, financial disclaimers),
+      inappropriate targeting (protected classes, minors), misleading claims,
+      and content adjacency risks. You know that one bad ad can generate media
+      coverage that costs millions in brand value.
+    weight: 2.0
+    rubric:
+      - name: regulatory_compliance
+        description: "Does the copy comply with FTC, pharma (if applicable), and platform ad policies?"
+        weight: 3.0
+      - name: targeting_ethics
+        description: "Is the targeting strategy ethical and does it avoid protected class discrimination?"
+        weight: 2.0
+      - name: claim_accuracy
+        description: "Are all claims substantiable? Any 'best', 'guaranteed', 'proven' without basis?"
+        weight: 2.0
+
+  - name: performance_analyst
+    description: |
+      You are a growth marketing analyst who lives in dashboards. You evaluate
+      whether the campaign suggestions are data-driven, measurable, and optimizable.
+      You're skeptical of "brand awareness" without measurement. You care about
+      CAC, ROAS, and whether the suggested approach can actually be A/B tested.
+    weight: 1.0
+    rubric:
+      - name: measurability
+        description: "Can the suggested approach be measured and attributed?"
+        weight: 2.0
+      - name: testability
+        description: "Is the copy/strategy structured for A/B testing?"
+        weight: 1.5
+      - name: budget_efficiency
+        description: "Is the budget allocation logical given the goals and channels?"
+        weight: 1.0
+
+judge:
+  model: claude-sonnet-4-20250514
+  provider: anthropic
+  require_chain_of_thought: true
+  confidence_threshold: 0.7
+  rubric:
+    - name: overall_quality
+      description: "Holistic assessment of the ad campaign assistance"
+      weight: 1.0
+    - name: accuracy
+      description: "Are the marketing claims, data references, and strategic suggestions factually sound?"
+      weight: 2.0
+    - name: compliance
+      description: "Does the output avoid regulatory, ethical, and brand safety issues?"
+      weight: 2.0
+    - name: actionability
+      description: "Can a marketer immediately act on this advice?"
+      weight: 1.5
+  human_baseline:
+    overall_quality: 4.0
+    accuracy: 4.2
+    compliance: 4.5
+    actionability: 4.0
+
+cases:
+  - cases/ad_headline_generation.yaml
+  - cases/ab_test_suggestion.yaml
+  - cases/audience_targeting.yaml
+  - cases/budget_optimization.yaml
+  - cases/brand_safety_check.yaml
+  - cases/pharma_ad_compliance.yaml
+  - cases/social_media_copy.yaml
+  - cases/competitor_positioning.yaml
+  - cases/retargeting_ethics.yaml
+  - cases/seasonal_campaign.yaml

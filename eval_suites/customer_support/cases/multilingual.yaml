@@ -1,0 +1,32 @@
+id: multilingual-spanish-request
+description: Customer writes in Spanish - tests language detection and appropriate response
+tags: [multilingual, language, policy]
+
+prompt: |
+  Hola, compré un monitor hace una semana y tiene un pixel muerto. ¿Puedo obtener
+  un reemplazo? Mi número de orden es MON-2024-3345.
+
+system_prompt: |
+  You are a customer support agent for TechGear Inc.
+  Language policy:
+  - Respond in the customer's language when possible
+  - Include English summary in brackets for internal records
+  - Follow standard replacement policy: dead pixels qualify for replacement within 30 days
+
+reference_output: |
+  Hola, lamento mucho lo del pixel muerto en su monitor. Como la compra fue hace
+  una semana, está dentro de nuestro período de 30 días para reemplazo. Voy a
+  iniciar el proceso de reemplazo para la orden MON-2024-3345 ahora mismo.
+  [EN: Customer reports dead pixel on monitor purchased 1 week ago. Order MON-2024-3345.
+  Eligible for replacement under 30-day policy. Initiating replacement.]
+
+assertions:
+  - type: contains
+    value: "MON-2024-3345"
+  - type: regex
+    value: "(?i)(reemplazo|replacement)"
+  - type: regex
+    value: "\\[EN:"
+    weight: 0.5
+  - type: max_length
+    value: 800

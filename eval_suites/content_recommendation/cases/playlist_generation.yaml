@@ -1,0 +1,58 @@
+id: rec-playlist-dinner-party
+description: User asks for a dinner party playlist — tests contextual curation vs. generic hits
+tags: [playlist, context-aware, music, curation]
+
+prompt: |
+  I'm hosting a dinner party for 6 people tonight. Mix of ages (late 20s to
+  early 50s). The vibe is casual but not background muzak — I want people to
+  notice the music is good but not have to shout over it. I like jazz and
+  soul but I'm open to anything.
+
+system_prompt: |
+  You are a music recommendation assistant. When generating playlists:
+  - Ask about context (they provided it) and curate accordingly
+  - Mix familiar and discovery tracks — anchor with recognizable artists, bridge to lesser-known ones
+  - Consider tempo and energy arc (dinner party = build slowly)
+  - Include brief reasoning for key picks, not just a list
+  - 10-15 songs is enough for a dinner playlist — don't overwhelm
+  - Be specific with songs, not just artists
+  Available catalog: full streaming library (all major labels + indie)
+
+reference_output: |
+  Here's a dinner party arc — starts mellow, builds gently, then grooves:
+
+  **Arrival / Appetizers (setting the mood):**
+  1. Norah Jones — "Don't Know Why" — warm, recognizable, low-key
+  2. Khruangbin — "Time (You and I)" — jazzy and chill, great discovery pick
+  3. Sade — "No Ordinary Love" — everyone likes Sade, nobody admits it
+
+  **Main Course (conversational energy):**
+  4. Tom Misch — "It Runs Through Me (ft. De La Soul)" — modern soul, upbeat enough
+  5. Erykah Badu — "On & On" — neo-soul classic, bridges generations
+  6. Jordan Rakei — "Wildfire" — if you don't know him, this will be the "who is this?" moment
+  7. Amy Winehouse — "Valerie" — crowd-pleaser, lifts the energy
+
+  **Dessert / Drinks (groove):**
+  8. Anderson .Paak — "Come Down" — more energy, people are loose now
+  9. D'Angelo — "Untitled (How Does It Feel)" — smooth closer
+  10. Vulfpeck — "Dean Town" — funky instrumental, great conversation backdrop
+
+  The arc goes: warm jazz/soul → neo-soul energy → funky groove. Mix of
+  recognizable (Amy, Sade) and discovery (Khruangbin, Jordan Rakei).
+
+assertions:
+  - type: regex
+    value: "(?i)(jazz|soul|neo.?soul)"
+  - type: regex
+    value: "(?i)(arrival|appetizer|main|dessert|arc|build|energy)"
+    weight: 2.0
+  - type: regex
+    value: "\\d+\\."
+    weight: 1.0
+  - type: regex
+    value: "(?i)(recognizable|familiar|discovery|lesser.?known|new)"
+    weight: 1.5
+  - type: not_contains
+    value: "Here are some popular songs"
+  - type: max_length
+    value: 1000

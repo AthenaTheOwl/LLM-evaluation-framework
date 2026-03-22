@@ -1,0 +1,77 @@
+name: code-reviewer-eval
+description: Evaluates code review assistant quality across security, style, and bug detection
+version: "1.0"
+model: claude-sonnet-4-20250514
+provider: anthropic
+
+stages:
+  - deterministic
+  - persona
+  - judge
+
+fail_fast: false
+
+thresholds:
+  deterministic_pass_rate: 0.85
+  persona_min_score: 3.5
+  judge_min_score: 4.0
+  regression_tolerance: 0.05
+
+personas:
+  - name: senior_engineer
+    description: |
+      You are a principal engineer with 15+ years of experience.
+      Evaluate whether the code review catches the right issues and provides
+      actionable, correct fixes.
+    weight: 2.0
+    rubric:
+      - name: issue_detection
+        description: "Did the review identify the most important issues?"
+        weight: 3.0
+      - name: fix_quality
+        description: "Are the suggested fixes correct and complete?"
+        weight: 2.0
+      - name: prioritization
+        description: "Are issues correctly prioritized by severity?"
+        weight: 1.0
+
+  - name: junior_developer
+    description: |
+      You are a junior developer who submitted this code for review.
+      Evaluate whether the feedback is clear, educational, and encouraging.
+    weight: 1.0
+    rubric:
+      - name: clarity
+        description: "Can a junior developer understand the feedback?"
+        weight: 2.0
+      - name: educational_value
+        description: "Does the review explain WHY something is an issue?"
+        weight: 1.5
+      - name: tone
+        description: "Is the feedback constructive and encouraging?"
+        weight: 1.0
+
+judge:
+  model: claude-sonnet-4-20250514
+  provider: anthropic
+  require_chain_of_thought: true
+  confidence_threshold: 0.7
+  rubric:
+    - name: accuracy
+      description: "Are the identified issues real and correctly explained?"
+      weight: 3.0
+    - name: completeness
+      description: "Does the review cover all significant issues?"
+      weight: 2.0
+    - name: actionability
+      description: "Can the developer immediately act on the feedback?"
+      weight: 1.5
+  human_baseline:
+    accuracy: 4.3
+    completeness: 3.9
+    actionability: 4.0
+
+cases:
+  - cases/security_review.yaml
+  - cases/style_feedback.yaml
+  - cases/bug_detection.yaml

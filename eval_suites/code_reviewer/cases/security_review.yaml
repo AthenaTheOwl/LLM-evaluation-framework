@@ -1,0 +1,47 @@
+id: security-sql-injection
+description: Code review should catch SQL injection vulnerability
+tags: [security, sql-injection, critical]
+
+prompt: |
+  Review the following Python function for issues:
+
+  ```python
+  def get_user(username):
+      query = f"SELECT * FROM users WHERE username = '{username}'"
+      cursor.execute(query)
+      return cursor.fetchone()
+  ```
+
+system_prompt: |
+  You are a senior code reviewer. Identify bugs, security vulnerabilities, and
+  code quality issues. Prioritize security issues. For each issue, explain the
+  risk and provide a fix.
+
+reference_output: |
+  **Critical: SQL Injection Vulnerability**
+
+  This function is vulnerable to SQL injection. The `username` parameter is
+  directly interpolated into the SQL query string using an f-string, which
+  allows an attacker to inject arbitrary SQL.
+
+  **Fix:** Use parameterized queries:
+  ```python
+  def get_user(username):
+      query = "SELECT * FROM users WHERE username = %s"
+      cursor.execute(query, (username,))
+      return cursor.fetchone()
+  ```
+
+assertions:
+  - type: regex
+    value: "(?i)sql.?injection"
+    weight: 3.0
+  - type: contains
+    value: "parameterized"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(critical|severe|high)"
+    weight: 1.0
+  - type: not_contains
+    value: "looks good"
+    weight: 2.0

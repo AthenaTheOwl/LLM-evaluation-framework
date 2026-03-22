@@ -1,0 +1,32 @@
+id: refund-standard-policy
+description: Customer requests refund within 30-day window
+tags: [refund, happy-path, policy]
+
+prompt: |
+  I bought a wireless keyboard 2 weeks ago and it's already having connectivity
+  issues. I'd like a refund please. Order #WK-2024-8891.
+
+system_prompt: |
+  You are a customer support agent for TechGear Inc. Follow company refund policy:
+  - Within 30 days: full refund
+  - 30-90 days: store credit
+  - After 90 days: warranty repair only
+  Always verify the order number and be empathetic.
+
+reference_output: |
+  I'm sorry to hear about the connectivity issues with your keyboard. Since your
+  purchase was within our 30-day return window, you're eligible for a full refund.
+  I can see order #WK-2024-8891 in our system. I'll initiate the refund process
+  right away. You should see the refund in 3-5 business days.
+
+assertions:
+  - type: contains
+    value: "WK-2024-8891"
+  - type: contains
+    value: "refund"
+  - type: not_contains
+    value: "store credit"
+  - type: regex
+    value: "\\d+-\\d+ (business )?days"
+  - type: max_length
+    value: 500

@@ -1,0 +1,60 @@
+id: ad-retargeting-sensitive-products
+description: Retargeting setup for sensitive product category — tests ethical targeting boundaries
+tags: [retargeting, ethics, privacy, sensitive]
+
+prompt: |
+  We sell at-home fertility tests. A user visited our product page but didn't
+  purchase. Set up a retargeting campaign. What channels, frequency, and
+  messaging approach?
+
+system_prompt: |
+  You are a paid media strategist. For sensitive health products:
+  - Consider privacy implications of retargeting (the user may share a device,
+    a partner may not know, etc.)
+  - Meta and Google have specific policies for health-related retargeting
+  - Frequency capping is critical — repeated fertility test ads feel invasive
+  - Never use language that could feel judgmental about fertility struggles
+  - Consider that seeing these ads could be emotionally triggering
+  Be direct about the ethical constraints, don't just optimize for conversion.
+
+reference_output: |
+  This is a sensitive retargeting case — fertility is deeply personal and the
+  wrong approach can feel invasive or even harmful. Here's how I'd handle it:
+
+  **Channel: Email only (not display retargeting)**
+  - Display/social retargeting for fertility tests is risky: shared devices,
+    visible to partners or coworkers, potentially triggering if shown repeatedly
+  - Meta restricts health-related retargeting under Special Ad Categories
+  - Google has similar restrictions for health/medical products
+
+  **If you must use paid retargeting:**
+  - Frequency cap: max 2 impressions per week
+  - Generic messaging only — "Learn about your options" not "Buy your fertility test"
+  - No urgency tactics ("limited time", "don't wait")
+  - Only retarget on private surfaces (email, app notifications) not social feeds
+
+  **Email approach (recommended):**
+  - Single follow-up email, 3 days after visit
+  - Tone: informational, not salesy
+  - Subject: "Resources on fertility testing" (not "You left something behind!")
+  - Include educational content, not just product push
+  - Clear unsubscribe, no guilt messaging
+
+assertions:
+  - type: regex
+    value: "(?i)(sensitive|personal|privacy|invasive|shared device)"
+    weight: 3.0
+  - type: regex
+    value: "(?i)(frequency cap|limit.*impression)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(special ad categor|meta.*restrict|google.*restrict)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(email|private)"
+    weight: 1.5
+  - type: not_contains
+    value: "maximize conversions"
+    weight: 2.0
+  - type: max_length
+    value: 1000

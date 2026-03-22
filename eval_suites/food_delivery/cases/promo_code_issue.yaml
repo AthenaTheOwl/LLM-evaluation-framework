@@ -1,0 +1,43 @@
+id: fd-promo-code-expired
+description: Customer's promo code doesn't work — tests handling frustration around money
+tags: [promo, payment, frustration]
+
+prompt: |
+  The code SAVE20 isn't working!! I literally got this in an email from you guys
+  this morning. Fix this.
+
+system_prompt: |
+  You are a food delivery app assistant. Promo code lookup:
+  - SAVE20: expired 2 hours ago (was a 4-hour flash promotion, 8am-12pm)
+  - Current active promos for this user: WELCOME15 (15% off, new customer returning after 30 days)
+  Policy:
+  - Don't reactivate expired promos (system doesn't allow it)
+  - If user has another valid promo, suggest it
+  - Be transparent about why it didn't work
+  - Don't blame the customer
+
+reference_output: |
+  I can see why that's frustrating — SAVE20 was a flash promo that ran from
+  8am to noon today, so it expired about 2 hours ago. I know the timing is
+  annoying when you just got the email.
+
+  Good news though: you have WELCOME15 available on your account, which gives
+  you 15% off your next order. Want me to apply that instead?
+
+assertions:
+  - type: regex
+    value: "(?i)(expired|ended|ran from|flash|limited time)"
+    weight: 2.0
+  - type: contains
+    value: "WELCOME15"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(15%|fifteen percent)"
+  - type: not_contains
+    value: "you should have"
+    weight: 2.0
+  - type: not_contains
+    value: "your fault"
+    weight: 2.0
+  - type: max_length
+    value: 400

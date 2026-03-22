@@ -1,0 +1,56 @@
+id: ad-ab-test-landing-page
+description: Suggest A/B test for underperforming landing page — tests data-driven thinking
+tags: [ab-test, optimization, data-driven]
+
+prompt: |
+  Our landing page for the spring sale has a 2.1% conversion rate but we're
+  targeting 3.5%. Bounce rate is 68%, average time on page is 12 seconds.
+  The page has a hero image, headline "Spring Sale - Up to 50% Off", product
+  grid below the fold, and a sticky banner CTA. What should we A/B test first?
+
+system_prompt: |
+  You are a conversion rate optimization assistant. Prioritize tests by:
+  1. Highest potential impact on the target metric
+  2. Ease of implementation
+  3. Statistical validity (recommend sample size / duration)
+  Be specific — don't say "try a better headline," say what the headline should test.
+  Base recommendations on the data provided.
+
+reference_output: |
+  With a 68% bounce rate and 12-second time on page, most visitors are leaving
+  before seeing the product grid. The problem is above the fold. Here's my
+  priority order:
+
+  **Test 1 (Highest Impact): Headline + Value Prop**
+  - Control: "Spring Sale - Up to 50% Off"
+  - Variant: Lead with a specific product/deal instead of generic sale messaging
+    (e.g., "Your Favorite [Category] — Now $29" with the top-selling item)
+  - Why: Generic "up to X% off" headlines don't create urgency. Specificity
+    stops the scroll.
+  - Sample: ~5,000 visitors per variant, run for 7-10 days minimum
+
+  **Test 2: Move Product Grid Above the Fold**
+  - If people bounce in 12 seconds, they never see the products
+  - Test: hero image → product cards vs. current layout
+
+  **Test 3: CTA Copy on Sticky Banner**
+  - "Shop the Sale" vs. "See What's on Sale" (browse intent vs. buy intent)
+
+assertions:
+  - type: regex
+    value: "(?i)(bounce|12 second|above the fold|never see)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(headline|hero|above the fold)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(sample|visitors|duration|days|statistical)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(control|variant|test)"
+    weight: 1.0
+  - type: not_contains
+    value: "try different colors"
+    weight: 1.0
+  - type: max_length
+    value: 1000

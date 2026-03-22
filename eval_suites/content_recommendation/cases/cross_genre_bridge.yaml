@@ -1,0 +1,61 @@
+id: rec-cross-genre-bridge
+description: User wants to explore a new genre but doesn't know where to start — tests bridging
+tags: [cross-genre, discovery, bridge, music]
+
+prompt: |
+  I only listen to hip-hop (Kendrick, J. Cole, Tyler the Creator) but my
+  girlfriend keeps telling me I should try jazz. I tried Kind of Blue and
+  fell asleep. Is there a way into jazz that doesn't bore me?
+
+system_prompt: |
+  You are a music recommendation assistant. For cross-genre bridging:
+  - Start from what they ALREADY like and build a bridge
+  - Don't start with "essential" classics — that's how you lose people
+  - Hip-hop and jazz have deep connections — use those
+  - Suggest artists/tracks that sit in the overlap zone first, then push further
+  - Be honest that Kind of Blue is slow-burn — it's not a gateway for everyone
+  - 4-6 suggestions in a progression from familiar to new
+
+reference_output: |
+  Kind of Blue is incredible but it's the worst jazz gateway for a hip-hop
+  listener — it's like trying to get into movies by starting with a 3-hour
+  Tarkovsky film.
+
+  Here's your bridge, from hip-hop-adjacent to actually-jazz:
+
+  **Step 1: Stuff that's basically hip-hop with jazz DNA**
+  - **Robert Glasper — "Black Radio"** — this is your gateway album. He literally
+    plays with hip-hop artists over jazz. Kendrick has worked with him.
+  - **Kamasi Washington — "The Epic"** — big, cinematic jazz. Kamasi played on
+    Kendrick's "To Pimp a Butterfly"
+
+  **Step 2: Jazz that grooves like hip-hop**
+  - **Roy Hargrove — "Strasbourg / St. Denis"** — hard bop that swings hard.
+    The Roots sampled him constantly.
+  - **Herbie Hancock — "Head Hunters"** — funky, rhythmic, not sleepy at all
+
+  **Step 3: Now try this**
+  - **Miles Davis — "Bitches Brew"** — this is the Miles that hip-hop producers
+    sample. Electric, weird, intense. Not Kind of Blue.
+
+  The connection between hip-hop and jazz is real — a ton of the beats you love
+  are built on jazz samples. You're already a jazz fan, you just don't know it yet.
+
+assertions:
+  - type: regex
+    value: "(?i)(glasper|kamasi|hip.?hop.*jazz|jazz.*hip.?hop|bridge|gateway)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(sample|Kendrick|butterfly|producer)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(step|progression|start|then|first.*then)"
+    weight: 2.0
+  - type: not_contains
+    value: "you should appreciate"
+    weight: 2.0
+  - type: not_contains
+    value: "Kind of Blue is essential"
+    weight: 1.0
+  - type: max_length
+    value: 1000

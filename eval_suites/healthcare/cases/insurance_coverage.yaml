@@ -1,0 +1,69 @@
+id: hc-insurance-prior-auth
+description: Patient confused about insurance denial — tests ability to explain bureaucracy clearly
+tags: [insurance, prior-authorization, administrative, health-literacy]
+
+prompt: |
+  My doctor ordered an MRI for my knee but the insurance company denied it.
+  They said I need "prior authorization." What does that even mean? Can they
+  just refuse what my doctor says I need?
+
+system_prompt: |
+  You are a patient-facing health information assistant.
+  POLICY: For insurance/administrative questions:
+  - Explain the process in plain language
+  - Be honest that insurance denials are frustrating but navigable
+  - Outline the typical prior authorization process and appeal options
+  - Don't take sides (insurance vs. doctor) — explain the system
+  - Suggest specific next steps the patient can take
+  - Don't provide specific insurance advice (plans vary)
+  - Include disclaimer
+
+reference_output: |
+  This is really frustrating — I hear you. Let me explain what's happening
+  in plain terms.
+
+  **What "prior authorization" means:**
+  Your insurance company wants your doctor to provide additional justification
+  for why the MRI is medically necessary before they'll agree to pay for it.
+  It's basically them saying "convince us this is needed" before approving
+  the cost. It's not a permanent denial.
+
+  **What typically happens next:**
+  1. Your doctor's office submits clinical documentation to the insurance
+     company explaining why you need the MRI
+  2. The insurance company reviews it (usually takes 5-15 business days)
+  3. They either approve it or deny it again
+
+  **What you can do:**
+  - Call your doctor's office and confirm they're submitting the prior auth
+    paperwork — sometimes it just needs a nudge
+  - Ask your insurance company what specific information they need
+  - If it's denied again, you have the right to appeal (your insurance card
+    should have a number for appeals)
+  - Ask your doctor if there's an alternative test insurance might cover sooner
+
+  **Can they refuse what your doctor orders?** Unfortunately, yes — insurance
+  companies make coverage decisions that sometimes disagree with doctors.
+  But the appeal process exists for exactly this reason.
+
+  This is general information about how insurance typically works, not advice
+  about your specific plan.
+
+assertions:
+  - type: regex
+    value: "(?i)(prior auth|justify|medical.*necessar|documentation)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(appeal|right to appeal)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(call|contact).*(doctor|office|insurance)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(not.*permanent|temporary|not a final)"
+    weight: 1.5
+  - type: not_contains
+    value: "just pay out of pocket"
+    weight: 1.5
+  - type: max_length
+    value: 800

@@ -1,0 +1,49 @@
+id: fd-eta-past-due
+description: Delivery is 15 min past ETA — customer is anxious and hungry
+tags: [eta, late-delivery, high-emotion, retention-risk]
+
+prompt: |
+  My delivery was supposed to be here 15 minutes ago. The app just says
+  "arriving soon" but I can see the driver hasn't moved in 10 minutes.
+  What's going on?? I have guests waiting.
+
+system_prompt: |
+  You are a food delivery app assistant. Real-time driver data:
+  - Driver: Priya
+  - Status: stopped at the restaurant for 12 minutes (restaurant running behind on the order)
+  - Original ETA: 7:30 PM, current time: 7:45 PM
+  - Revised ETA: 7:58 PM (13 minutes from now)
+  - The "arriving soon" message is a known UX issue being fixed — it shows
+    when driver is within 1 mile even if stopped
+  Policy: Be transparent about delays. Don't hide behind vague language. If ETA
+  passes by 15+ min, offer a small credit without being asked.
+
+reference_output: |
+  I can see what's happening — Priya is at the restaurant waiting for your order.
+  They're running behind, which is why she hasn't moved. The app saying "arriving
+  soon" is misleading (we're fixing that).
+
+  Honest updated ETA: about 13 more minutes, so around 7:58 PM.
+
+  Since you're already 15 minutes past the original time and have guests waiting,
+  I'm adding a $5 credit to your account. If it goes past 8:00, let me know
+  and we'll do more.
+
+assertions:
+  - type: regex
+    value: "(?i)(priya|driver).*(restaurant|waiting|stopped)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(7:58|13 min|updated eta|revised)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(\\$5|credit|compensation)"
+    weight: 1.5
+  - type: not_contains
+    value: "arriving soon"
+    weight: 1.0
+  - type: not_contains
+    value: "please be patient"
+    weight: 2.0
+  - type: max_length
+    value: 500

@@ -1,0 +1,61 @@
+id: ad-seasonal-black-friday
+description: Plan Black Friday campaign with tight timeline — tests operational planning + creative
+tags: [seasonal, black-friday, planning, timeline]
+
+prompt: |
+  It's November 1st. We need a Black Friday campaign for our online furniture store.
+  Budget: $30K. We've never done Black Friday before. Main products are mid-century
+  modern sofas ($800-$2000) and dining tables ($600-$1500). Average order value
+  is $1,200. What's the plan?
+
+system_prompt: |
+  You are a campaign strategist. For a seasonal campaign with tight timeline:
+  - Be realistic about what can be launched in 3-4 weeks
+  - Furniture is a high-consideration purchase — impulse Black Friday tactics don't work the same
+  - Include timeline with specific dates
+  - Suggest discount strategy (% off, $ off, bundle, etc.)
+  - Channel recommendations with budget split
+  - Don't over-promise — a first-time BF campaign with $30K budget has real constraints
+
+reference_output: |
+  **Reality check:** Furniture isn't an impulse buy. Black Friday for $1,200 sofas
+  is about accelerating decisions people are already considering, not creating new demand.
+
+  **Timeline:**
+  - Nov 1-7: Creative production (3 ad sets: teaser, main event, last chance)
+  - Nov 8-14: Warm-up phase — email list + social teasers ("something's coming")
+  - Nov 15-20: Early access for email subscribers
+  - Nov 21-27: Main campaign push
+  - Nov 28 (BF) - Dec 2 (CM): Peak spend, urgency messaging
+
+  **Discount strategy:** $200 off orders over $1,000 (not percentage — flat dollar
+  feels bigger on high-ticket items). Free white-glove delivery as a sweetener.
+
+  **Budget split ($30K):**
+  - Meta retargeting (past site visitors): $10K — these people already browsed
+  - Google Search (branded + "black friday furniture"): $8K
+  - Meta prospecting (mid-century modern interests): $7K
+  - Email (existing list): $2K
+  - Reserve for top performers: $3K
+
+  **Constraints to accept:** With $30K and 4 weeks, you won't compete with
+  Wayfair or West Elm on reach. Focus on retargeting and your existing audience.
+
+assertions:
+  - type: regex
+    value: "(?i)(timeline|nov|date|week)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(high.?consider|not.*impulse|already considering)"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(budget.*split|\\$\\d+[Kk]|allocation)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(retarget|existing|past visitor)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(discount|\\$ off|percentage|free)"
+    weight: 1.0
+  - type: max_length
+    value: 1200

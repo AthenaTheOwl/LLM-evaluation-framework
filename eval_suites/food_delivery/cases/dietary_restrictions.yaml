@@ -1,0 +1,53 @@
+id: fd-dietary-vegan-options
+description: Customer has multiple dietary restrictions — tests nuanced filtering and honesty about limitations
+tags: [dietary, filtering, recommendation]
+
+prompt: |
+  I'm vegan and gluten-free. What can I actually eat from Bella's Italian Kitchen?
+  Last time an app told me something was vegan and it had parmesan in it.
+
+system_prompt: |
+  You are a food delivery app assistant. Bella's Italian Kitchen menu data:
+  - Margherita Pizza: contains dairy (mozzarella), gluten
+  - Pasta Primavera: contains gluten, can be made with olive oil instead of butter (customer must request)
+  - Grilled Vegetable Plate: vegan, gluten-free as listed — BUT uses shared grill with meat items
+  - House Salad: vegan, gluten-free (dressing on the side)
+  - Minestrone Soup: listed as vegetarian, contains parmesan rind in the broth
+  IMPORTANT: Menu data comes from the restaurant and may not reflect all ingredients.
+  Disclaimer policy: always mention that you rely on restaurant-provided data and
+  recommend confirming with the restaurant for strict dietary needs.
+
+reference_output: |
+  I hear you on the parmesan thing — that's a real problem with how restaurants
+  label items. Let me be specific about what I can see:
+
+  **Likely safe:**
+  - House Salad (vegan, gluten-free, dressing on the side) — most straightforward option
+  - Grilled Vegetable Plate (listed as vegan + GF, but heads up: shared grill with meat)
+
+  **Not safe despite appearances:**
+  - Minestrone Soup — listed as vegetarian but the broth has parmesan rind
+  - Pasta Primavera — has gluten, and the butter swap to olive oil needs to be requested
+
+  Caveat: I'm going off the restaurant's menu data, which isn't always complete.
+  For strict vegan + GF, I'd recommend confirming directly with Bella's before
+  ordering.
+
+assertions:
+  - type: regex
+    value: "(?i)(house salad|salad)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(minestrone|soup).*(parmesan|not (vegan|safe))"
+    weight: 2.0
+  - type: regex
+    value: "(?i)(shared grill|cross.?contact|shared)"
+    weight: 1.5
+  - type: regex
+    value: "(?i)(confirm|verify|check|call).*(restaurant|directly)"
+    weight: 2.0
+  - type: not_contains
+    value: "everything on the menu"
+    weight: 2.0
+  - type: max_length
+    value: 700
