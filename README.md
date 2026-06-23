@@ -125,6 +125,35 @@ the included GitHub Actions workflow runs three jobs on every PR that touches `s
 
 set `ANTHROPIC_API_KEY` and/or `OPENAI_API_KEY` as repo secrets.
 
+## live demo
+
+Deploy with Streamlit Cloud using:
+
+```text
+streamlit_app.py
+```
+
+Local run:
+
+```bash
+python -m pip install -r requirements.txt
+python -m streamlit run streamlit_app.py
+```
+
+Verified CLI path:
+
+```bash
+python -m pip install -e ".[dev]"
+llm-evals validate eval_suites/customer_support/
+llm-evals run eval_suites/customer_support/ --stage deterministic --output console
+```
+
+## connects to
+
+- `trace-to-eval-harness` for packetizing eval evidence after a run.
+- `supplier-risk-rag-agent` for a domain RAG app with eval gates.
+- `News-Bias-Multi-Agent-Pipeline` for a small multi-implementation app with fixture evals.
+
 ## the suites
 
 - **customer support** — refunds, escalation, multilingual; personas: domain expert, end user, safety reviewer
