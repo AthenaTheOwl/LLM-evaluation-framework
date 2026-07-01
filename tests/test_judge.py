@@ -88,3 +88,33 @@ class TestJudgeStage:
         case = suite_with_judge.cases[0]
         result = stage.evaluate(case, "Test response", suite_with_judge)
         assert "addresses the question" in result.reasoning
+
+    def test_pass_threshold_boundary(self, suite_with_judge):
+        # overall_score exactly equals judge_min_score (3.5); the gate is >=.
+        provider = MockProvider(default_response=json.dumps({
+            "chain_of_thought": "borderline",
+            "dimension_scores": {"quality": 3.5, "faithfulness": 3.5},
+            "overall_score": 3.5,
+            "confidence": 0.8,
+        }))
+        stage = JudgeStage(judge_provider=provider)
+        case = suite_with_judge.cases[0]
+        result = stage.evaluate(case, "Test response", suite_with_judge)
+
+        assert result.overall_score == pytest.approx(3.5)
+        assert result.passed
+
+    def test_dimension_scores_clamped_to_scale(self, suite_with_judge):
+        # Out-of-scale dimension scores get clamped to [scale_min, scale_max] = [1.0, 5.0].
+        provider = MockProvider(default_response=json.dumps({
+            "chain_of_thought": "out of range",
+            "dimension_scores": {"quality": 9.0, "faithfulness": -2.0},
+            "overall_score": 4.0,
+            "confidence": 0.8,
+        }))
+        stage = JudgeStage(judge_provider=provider)
+        case = suite_with_judge.cases[0]
+        result = stage.evaluate(case, "Test response", suite_with_judge)
+
+        assert result.dimension_scores["quality"] == pytest.approx(5.0)
+        assert result.dimension_scores["faithfulness"] == pytest.approx(1.0)
