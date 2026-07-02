@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 import typer
+import yaml
 from rich.console import Console
 
 console = Console(force_terminal=True)
@@ -47,7 +48,13 @@ def run(
     from llm_evals.reporting.regression import save_baseline as do_save
     from llm_evals.runner import EvalRunner
 
-    suite = load_suite(suite_path)
+    # A typo'd path, wrong directory, or hand-edited YAML is a user mistake,
+    # not a bug -- report it like validate does instead of dumping a traceback.
+    try:
+        suite = load_suite(suite_path)
+    except (OSError, ValueError, yaml.YAMLError) as e:
+        console.print(f"[red]FAIL: {e}[/red]")
+        raise typer.Exit(code=1)
     if model:
         suite.model = model
     if provider:

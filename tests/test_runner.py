@@ -160,3 +160,49 @@ class TestEvalRunner:
         assert result.aggregate_scores["judge"] == pytest.approx(1.0)
         assert not result.stage_passed["judge"]
         assert not result.passed
+
+    def test_case_overall_score_averages_stage_scores(self):
+        # Deterministic passes both assertions -> score 1.0; judge returns 3.0.
+        # The per-case aggregate is the mean of the two stage scores: (1.0 + 3.0) / 2 = 2.0.
+        model_provider = MockProvider(default_response="help refund")
+        judge_provider = MockProvider(default_response=json.dumps({
+            "dimension_scores": {"quality": 3.0},
+            "overall_score": 3.0,
+            "confidence": 0.9,
+        }))
+
+        suite = EvalSuite(
+            name="overall-score-check",
+            model="mock",
+            provider="mock",
+            stages=["deterministic", "judge"],
+            judge=JudgeConfig(
+                model="mock",
+                provider="mock",
+                rubric=[RubricDimension(name="quality", description="Overall quality")],
+            ),
+            cases=[
+                EvalCase(
+                    id="case-1",
+                    prompt="Help me with a refund",
+                    assertions=[
+                        Assertion(type=AssertionType.CONTAINS, value="help"),
+                        Assertion(type=AssertionType.CONTAINS, value="refund"),
+                    ],
+                ),
+            ],
+        )
+
+        runner = EvalRunner(
+            suite=suite,
+            model_provider=model_provider,
+            judge_provider=judge_provider,
+            concurrency=1,
+            stages_filter=["deterministic", "judge"],
+        )
+        result = runner.run()
+
+        case_result = result.case_results[0]
+        assert case_result.stage_results[0].score == pytest.approx(1.0)
+        assert case_result.stage_results[1].score == pytest.approx(3.0)
+        assert case_result.overall_score == pytest.approx(2.0)

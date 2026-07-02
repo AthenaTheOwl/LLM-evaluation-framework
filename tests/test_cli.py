@@ -75,3 +75,29 @@ def test_provider_override_applies_to_judge(tmp_path, monkeypatch):
 
     assert result.exit_code == 0
     assert called_providers == ["mock", "mock"]
+
+
+def test_run_nonexistent_path_reports_clean_error(tmp_path):
+    runner = CliRunner()
+    result = runner.invoke(app, ["run", str(tmp_path / "nope")])
+    assert result.exit_code == 1
+    assert "FAIL" in result.output
+    assert "Traceback" not in result.output
+
+
+def test_run_directory_without_suite_reports_clean_error(tmp_path):
+    runner = CliRunner()
+    result = runner.invoke(app, ["run", str(tmp_path)])
+    assert result.exit_code == 1
+    assert "No suite.yaml" in result.output
+    assert "Traceback" not in result.output
+
+
+def test_run_malformed_yaml_reports_clean_error(tmp_path):
+    with open(tmp_path / "suite.yaml", "w", encoding="utf-8") as f:
+        f.write("name: [bad\n  broken: :\n")
+    runner = CliRunner()
+    result = runner.invoke(app, ["run", str(tmp_path)])
+    assert result.exit_code == 1
+    assert "FAIL" in result.output
+    assert "Traceback" not in result.output
