@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -113,19 +114,97 @@ def run(
 
 @app.command()
 def validate(
-    suite_path: str = typer.Argument(..., help="Path to eval suite YAML or directory"),
+    suite: Optional[str] = typer.Option(
+        None,
+        "--suite",
+        help="Validate a single eval suite YAML file.",
+    ),
 ):
-    """Validate an eval suite configuration without running it."""
-    from llm_evals.config import validate_suite
+    """Validate eval suite configurations without running them."""
+    from llm_evals.config import discover_suites, validate_suite
 
-    issues = validate_suite(suite_path)
-    if not issues:
-        console.print("[green]PASS: Suite configuration is valid[/green]")
+    if suite is not None:
+        suite_paths = [_readable_suite_file(Path(suite))]
     else:
-        console.print("[red]FAIL: Validation issues found:[/red]")
-        for issue in issues:
-            console.print(f"  - {issue}")
+        suite_paths = _suite_paths_for_target(Path("eval_suites"), discover_suites)
+
+    failed_count = 0
+    for path in suite_paths:
+        issues = validate_suite(path)
+        if issues:
+            reason = "; ".join(_one_line(issue) for issue in issues)
+            typer.echo(f"FAIL {path}: {reason}")
+            failed_count += 1
+        else:
+            typer.echo(f"OK {path}")
+
+    if failed_count:
         raise typer.Exit(code=1)
+
+
+def _suite_paths_for_target(target: Path, discover_suites) -> list[Path]:
+    """Resolve the default validation target into suite files."""
+    try:
+        exists = target.exists()
+    except OSError as e:
+        _print_path_error(f"{target}: {e}")
+        raise typer.Exit(code=2)
+
+    if not exists:
+        _print_path_error(f"{target}: path does not exist")
+        raise typer.Exit(code=2)
+
+    if target.is_file():
+        return [_readable_suite_file(target)]
+
+    if not target.is_dir():
+        _print_path_error(f"{target}: expected a file or directory")
+        raise typer.Exit(code=2)
+
+    if not os.access(target, os.R_OK):
+        _print_path_error(f"{target}: path is not readable")
+        raise typer.Exit(code=2)
+
+    suites = discover_suites(target)
+    if not suites:
+        typer.echo(f"FAIL {target}: no suites found")
+        raise typer.Exit(code=1)
+
+    return suites
+
+
+def _readable_suite_file(path: Path) -> Path:
+    try:
+        exists = path.exists()
+    except OSError as e:
+        _print_path_error(f"{path}: {e}")
+        raise typer.Exit(code=2)
+
+    if not exists:
+        _print_path_error(f"{path}: path does not exist")
+        raise typer.Exit(code=2)
+
+    if path.is_dir():
+        _print_path_error(f"{path}: expected a file, got a directory")
+        raise typer.Exit(code=2)
+
+    if not path.is_file():
+        _print_path_error(f"{path}: expected a file")
+        raise typer.Exit(code=2)
+
+    if not os.access(path, os.R_OK):
+        _print_path_error(f"{path}: path is not readable")
+        raise typer.Exit(code=2)
+
+    return path
+
+
+def _one_line(message: str) -> str:
+    return " ".join(str(message).split())
+
+
+def _print_path_error(message: str) -> None:
+    typer.echo(f"ERROR {message}", err=True)
 
 
 @app.command(name="list")
