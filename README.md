@@ -31,6 +31,14 @@ Validate the checked-in suites without running models:
 llm-evals validate eval_suites
 ```
 
+Run the API-free quickstart fixture and write a JSON report:
+
+```bash
+llm-evals run examples/quickstart_eval --stage deterministic --provider mock --output json --output-dir examples/reports
+```
+
+The checked-in example report is `examples/reports/quickstart-smoke.json`.
+
 ## Live demo
 
 This repo ships a Streamlit wrapper for the same local runner.

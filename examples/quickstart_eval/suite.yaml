@@ -1,0 +1,15 @@
+﻿name: quickstart-smoke
+description: A tiny API-free suite that proves the runner can execute and write a report.
+version: "1.0"
+model: mock-local
+provider: mock
+stages:
+  - deterministic
+fail_fast: false
+thresholds:
+  deterministic_pass_rate: 1.0
+  persona_min_score: 3.5
+  judge_min_score: 3.5
+  regression_tolerance: 0.05
+cases:
+  - cases/mock_response.yaml

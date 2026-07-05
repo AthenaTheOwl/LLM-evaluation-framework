@@ -1,0 +1,36 @@
+{
+  "suite_name": "quickstart-smoke",
+  "model": "mock-local",
+  "run_id": "quickstart",
+  "timestamp": "2026-07-05T00:00:00",
+  "case_results": [
+    {
+      "case_id": "mock-response-smoke",
+      "model_output": "This is a mock response.",
+      "stage_results": [
+        {
+          "stage": "deterministic",
+          "score": 1.0,
+          "passed": true,
+          "details": {}
+        }
+      ],
+      "overall_score": 1.0,
+      "passed": true,
+      "latency_ms": 0.0,
+      "timestamp": "2026-07-05T00:00:00"
+    }
+  ],
+  "aggregate_scores": {
+    "deterministic": 1.0
+  },
+  "stage_thresholds": {
+    "deterministic": 1.0
+  },
+  "stage_passed": {
+    "deterministic": true
+  },
+  "pass_rate": 1.0,
+  "passed": true,
+  "regression": null
+}
