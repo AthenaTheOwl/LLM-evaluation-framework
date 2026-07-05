@@ -1,0 +1,14 @@
+﻿id: mock-response-smoke
+description: The mock provider should return its deterministic canned response.
+prompt: "Return the default mock response."
+system_prompt: "You are running the quickstart smoke fixture."
+assertions:
+  - type: contains
+    value: mock response
+    weight: 1.0
+  - type: not_contains
+    value: Traceback
+    weight: 1.0
+tags:
+  - quickstart
+  - smoke

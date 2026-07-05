@@ -114,6 +114,10 @@ def run(
 
 @app.command()
 def validate(
+    target: Optional[str] = typer.Argument(
+        None,
+        help="Suite YAML file or directory to validate. Defaults to eval_suites.",
+    ),
     suite: Optional[str] = typer.Option(
         None,
         "--suite",
@@ -124,9 +128,12 @@ def validate(
     from llm_evals.config import discover_suites, validate_suite
 
     if suite is not None:
+        if target is not None:
+            typer.echo("ERROR pass either a positional target or --suite, not both", err=True)
+            raise typer.Exit(code=2)
         suite_paths = [_readable_suite_file(Path(suite))]
     else:
-        suite_paths = _suite_paths_for_target(Path("eval_suites"), discover_suites)
+        suite_paths = _suite_paths_for_target(Path(target or "eval_suites"), discover_suites)
 
     failed_count = 0
     for path in suite_paths:

@@ -52,3 +52,20 @@ def test_validate_missing_suite_exits_two_without_traceback(tmp_path):
     assert result.exit_code == 2
     assert result.output == f"ERROR {suite_path}: path does not exist\n"
     assert "Traceback" not in result.output
+
+
+def test_validate_positional_directory_matches_quickstart_command():
+    result = CliRunner().invoke(app, ["validate", "eval_suites"])
+
+    assert result.exit_code == 0
+    assert f"OK {Path('eval_suites/code_reviewer/suite.yaml')}" in result.output
+    assert "Traceback" not in result.output
+
+
+def test_validate_rejects_positional_target_with_suite_option():
+    suite_path = Path("eval_suites/customer_support/suite.yaml")
+
+    result = CliRunner().invoke(app, ["validate", "eval_suites", "--suite", str(suite_path)])
+
+    assert result.exit_code == 2
+    assert result.output == "ERROR pass either a positional target or --suite, not both\n"
