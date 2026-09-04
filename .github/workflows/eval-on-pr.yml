@@ -33,6 +33,17 @@ jobs:
           python-version: '3.12'
           cache: pip
 
+      - name: Require the model API key
+        # Stage 1 grades real model output with assertions; without a key it
+        # used to die 17s in with a provider Traceback. Fail here, by name.
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "${ANTHROPIC_API_KEY}" ]; then
+            echo "::error::ANTHROPIC_API_KEY is not set as a repository secret. The deterministic stage calls the model and cannot run without it (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
       - name: Install dependencies
         run: pip install -e ".[dev]"
 
