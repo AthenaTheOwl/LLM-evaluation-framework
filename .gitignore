@@ -19,3 +19,4 @@ eval-results/
 reports/
 .ruff_cache/
 .mypy_cache/
+.pytest-basetemp*/
