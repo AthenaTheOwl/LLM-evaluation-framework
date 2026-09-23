@@ -1,0 +1,12 @@
+id: steady-refund-answer
+description: Answers the same way on every attempt.
+prompt: "Can I get a refund on an order that arrived damaged?"
+metadata:
+  mock_responses:
+    - "Yes. Damaged orders qualify for a full refund; reply with a photo and the order number."
+assertions:
+  - type: contains
+    value: full refund
+    weight: 1.0
+tags:
+  - reliability

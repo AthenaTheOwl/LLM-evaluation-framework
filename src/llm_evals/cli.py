@@ -37,6 +37,12 @@ def run(
     ),
     model: Optional[str] = typer.Option(None, help="Override model"),
     concurrency: int = typer.Option(5, help="Parallel eval cases"),
+    repeat: int = typer.Option(
+        1, "--repeat", min=1, help="Run each case k times and report pass@1, pass@k and pass^k"
+    ),
+    min_pass_hat_k: Optional[float] = typer.Option(
+        None, "--min-pass-hat-k", help="Exit 1 when the pass^k rate is below this (needs --repeat > 1)"
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed output"),
 ):
     """Run an evaluation suite through the pipeline."""
@@ -66,11 +72,13 @@ def run(
     stages_filter = None if stage == "all" else [stage]
 
     model_provider = get_provider(suite.provider)
+    _load_mock_sequences(model_provider, suite)
     runner = EvalRunner(
         suite=suite,
         model_provider=model_provider,
         concurrency=concurrency,
         stages_filter=stages_filter,
+        repeats=repeat,
     )
 
     console.print(f"[bold]Running eval suite:[/bold] {suite.name}")
@@ -89,6 +97,8 @@ def run(
     # Output
     if output == "console" or output == "all":
         print_results(result, verbose=verbose)
+        if result.reliability is not None:
+            _print_reliability(result.reliability)
 
     if output in ("json", "all"):
         path = save_json_report(result, output_dir)
@@ -104,6 +114,13 @@ def run(
         console.print(f"[dim]Baseline saved to {path}[/dim]")
 
     # Exit code
+    if min_pass_hat_k is not None and result.reliability is not None:
+        if result.reliability.pass_hat_k < min_pass_hat_k:
+            console.print(
+                f"[red]pass^{result.reliability.k} {result.reliability.pass_hat_k:.0%} is below "
+                f"{min_pass_hat_k:.0%} -- exiting with code 1[/red]"
+            )
+            raise typer.Exit(code=1)
     if fail_on_regression and result.regression and not result.regression.passed:
         console.print("[red]Regression detected -- exiting with code 1[/red]")
         raise typer.Exit(code=1)
@@ -147,6 +164,32 @@ def validate(
 
     if failed_count:
         raise typer.Exit(code=1)
+
+
+def _load_mock_sequences(provider, suite) -> None:
+    """Give the mock provider each case's scripted per-attempt responses (metadata.mock_responses)."""
+    from llm_evals.providers.mock import MockProvider
+
+    if not isinstance(provider, MockProvider):
+        return
+    for case in suite.cases:
+        responses = case.metadata.get("mock_responses")
+        if responses:
+            provider.sequences[case.prompt] = [str(r) for r in responses]
+
+
+def _print_reliability(reliability) -> None:
+    k = reliability.k
+    console.print()
+    console.print(f"[bold]Reliability over {k} attempts[/bold]")
+    console.print(
+        f"  pass@1 {reliability.pass_at_1:.0%}   pass@{k} {reliability.pass_at_k:.0%}   "
+        f"pass^{k} {reliability.pass_hat_k:.0%}"
+    )
+    for case in reliability.cases:
+        marks = "".join("P" if a else "F" for a in case.attempts)
+        flag = "" if case.pass_hat_k else "  <- not every time"
+        console.print(f"  {case.case_id:<32} {marks}{flag}")
 
 
 def _suite_paths_for_target(target: Path, discover_suites) -> list[Path]:

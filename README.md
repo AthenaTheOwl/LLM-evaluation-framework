@@ -39,6 +39,21 @@ llm-evals run examples/quickstart_eval --stage deterministic --provider mock --o
 
 The checked-in example report is `examples/reports/quickstart-smoke.json`.
 
+Run each case more than once. A case that passes on the first try and fails on the second is not a case you can put in front of a customer, and a single run cannot see it:
+
+```bash
+llm-evals run examples/reliability_eval --stage deterministic --provider mock --repeat 3
+```
+
+```text
+Reliability over 3 attempts
+  pass@1 100%   pass@3 100%   pass^3 50%
+  steady-refund-answer             PPP
+  flaky-refund-window              PFP  <- not every time
+```
+
+pass@1 is the first attempt, pass@k is any attempt, and pass^k is every attempt. Add `--min-pass-hat-k 1.0` to exit 1 when any case is not reliable. The mock provider replays each case's `metadata.mock_responses` in order, one per attempt, so the fixture needs no API key.
+
 ## Live demo
 
 This repo ships a Streamlit wrapper for the same local runner.

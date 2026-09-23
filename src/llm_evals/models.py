@@ -147,6 +147,24 @@ class RegressionReport(BaseModel):
     passed: bool = True
 
 
+class CaseReliability(BaseModel):
+    """One case run k times. pass^k asks whether it passed every time."""
+
+    case_id: str
+    attempts: list[bool] = Field(default_factory=list)
+    pass_at_1: bool = False
+    pass_at_k: bool = False
+    pass_hat_k: bool = False
+
+
+class ReliabilityReport(BaseModel):
+    k: int
+    pass_at_1: float = 0.0
+    pass_at_k: float = 0.0
+    pass_hat_k: float = 0.0
+    cases: list[CaseReliability] = Field(default_factory=list)
+
+
 class EvalSuiteResult(BaseModel):
     suite_name: str
     model: str
@@ -159,3 +177,4 @@ class EvalSuiteResult(BaseModel):
     pass_rate: float = 0.0
     passed: bool = False
     regression: Optional[RegressionReport] = None
+    reliability: Optional[ReliabilityReport] = None
