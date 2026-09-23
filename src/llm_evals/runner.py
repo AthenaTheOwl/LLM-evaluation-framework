@@ -8,10 +8,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
 from llm_evals.models import (
+    CaseReliability,
     EvalCase,
     EvalCaseResult,
     EvalSuite,
     EvalSuiteResult,
+    ReliabilityReport,
     StageResult,
 )
 from llm_evals.providers.base import LLMProvider, get_provider
@@ -31,10 +33,14 @@ class EvalRunner:
         judge_provider: Optional[LLMProvider] = None,
         concurrency: int = 5,
         stages_filter: Optional[list[str]] = None,
+        repeats: int = 1,
     ):
         self.suite = suite
         self.model_provider = model_provider or get_provider(suite.provider)
         self.concurrency = concurrency
+        if repeats < 1:
+            raise ValueError("repeats must be at least 1")
+        self.repeats = repeats
 
         # Determine which stages to run
         requested = stages_filter or suite.stages
@@ -57,25 +63,57 @@ class EvalRunner:
             self.stages.append(JudgeStage(judge_provider, judge_model))
 
     def run(self) -> EvalSuiteResult:
-        """Run all cases through the pipeline."""
-        case_results: list[EvalCaseResult] = []
+        """Run all cases through the pipeline, each one `repeats` times."""
+        attempts_by_case: list[list[EvalCaseResult]] = []
 
         if self.concurrency > 1:
             with ThreadPoolExecutor(max_workers=self.concurrency) as pool:
                 futures = {
-                    pool.submit(self._run_case, case): case for case in self.suite.cases
+                    pool.submit(self._run_attempts, case): case for case in self.suite.cases
                 }
                 for future in as_completed(futures):
-                    case_results.append(future.result())
+                    attempts_by_case.append(future.result())
         else:
             for case in self.suite.cases:
-                case_results.append(self._run_case(case))
+                attempts_by_case.append(self._run_attempts(case))
 
         # Sort by original case order
         case_order = {c.id: i for i, c in enumerate(self.suite.cases)}
-        case_results.sort(key=lambda r: case_order.get(r.case_id, 0))
+        attempts_by_case.sort(key=lambda a: case_order.get(a[0].case_id, 0))
 
-        return self._build_suite_result(case_results)
+        # The first attempt is the case's result, so a single run reports exactly as before.
+        result = self._build_suite_result([attempts[0] for attempts in attempts_by_case])
+        if self.repeats > 1:
+            result.reliability = self._reliability(attempts_by_case)
+        return result
+
+    def _run_attempts(self, case: EvalCase) -> list[EvalCaseResult]:
+        """Run one case `repeats` times, in order, so a scripted provider sees attempt 1 first."""
+        return [self._run_case(case) for _ in range(self.repeats)]
+
+    def _reliability(self, attempts_by_case: list[list[EvalCaseResult]]) -> ReliabilityReport:
+        """pass@1: first attempt passed. pass@k: any attempt passed. pass^k: every attempt passed."""
+        cases = []
+        for attempts in attempts_by_case:
+            passed = [a.passed for a in attempts]
+            passed += [False] * (self.repeats - len(passed))  # a missing attempt counts as a fail
+            cases.append(
+                CaseReliability(
+                    case_id=attempts[0].case_id,
+                    attempts=passed,
+                    pass_at_1=passed[0],
+                    pass_at_k=any(passed),
+                    pass_hat_k=all(passed),
+                )
+            )
+        n = len(cases) or 1
+        return ReliabilityReport(
+            k=self.repeats,
+            pass_at_1=sum(c.pass_at_1 for c in cases) / n,
+            pass_at_k=sum(c.pass_at_k for c in cases) / n,
+            pass_hat_k=sum(c.pass_hat_k for c in cases) / n,
+            cases=cases,
+        )
 
     def _run_case(self, case: EvalCase) -> EvalCaseResult:
         """Run a single case through all applicable stages."""

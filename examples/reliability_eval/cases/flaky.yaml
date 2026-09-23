@@ -1,0 +1,14 @@
+id: flaky-refund-window
+description: Right on the first and third attempt, wrong on the second. pass@1 hides it; pass^3 does not.
+prompt: "How many days do I have to return an unopened item?"
+metadata:
+  mock_responses:
+    - "You have 30 days from delivery to return an unopened item."
+    - "Returns are accepted within 90 days."
+    - "You have 30 days from delivery to return an unopened item."
+assertions:
+  - type: contains
+    value: 30 days
+    weight: 1.0
+tags:
+  - reliability
