@@ -96,11 +96,21 @@ def _print_regression(result: EvalSuiteResult) -> None:
     table = Table(title="Regression Report", show_lines=True)
     table.add_column("Metric", style="cyan")
     table.add_column("Delta", justify="right")
+    noisy = bool(reg.verdicts)
+    if noisy:
+        table.add_column("Baseline spread", justify="right")
+        table.add_column("Current spread", justify="right")
     table.add_column("Status", justify="center")
 
     for metric, delta in reg.score_deltas.items():
         color = "green" if delta >= 0 else "red"
         status = "[green]PASS[/green]" if metric not in reg.regressions else "[red]v[/red]"
-        table.add_row(metric, f"[{color}]{delta:+.3f}[/{color}]", status)
+        cells = [metric, f"[{color}]{delta:+.3f}[/{color}]"]
+        if noisy:
+            verdict = reg.verdicts.get(metric, "")
+            status = f"[red]{verdict}[/red]" if metric in reg.regressions else verdict
+            cells += [f"{reg.baseline_spread.get(metric, 0.0):.3f}",
+                      f"{reg.current_spread.get(metric, 0.0):.3f}"]
+        table.add_row(*cells, status)
 
     console.print(table)

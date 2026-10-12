@@ -145,6 +145,10 @@ class RegressionReport(BaseModel):
     score_deltas: dict[str, float] = Field(default_factory=dict)
     regressions: list[str] = Field(default_factory=list)
     passed: bool = True
+    # Filled only when the baseline was saved with --repeat > 1 (it carries a spread).
+    baseline_spread: dict[str, float] = Field(default_factory=dict)
+    current_spread: dict[str, float] = Field(default_factory=dict)
+    verdicts: dict[str, str] = Field(default_factory=dict)
 
 
 class CaseReliability(BaseModel):
@@ -178,3 +182,5 @@ class EvalSuiteResult(BaseModel):
     passed: bool = False
     regression: Optional[RegressionReport] = None
     reliability: Optional[ReliabilityReport] = None
+    # One aggregate-score dict per attempt; set only when --repeat > 1.
+    attempt_scores: list[dict[str, float]] = Field(default_factory=list)

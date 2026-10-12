@@ -1,0 +1,12 @@
+id: flaky-refund-window
+description: Now wrong on every attempt. The drop is far outside any spread.
+prompt: "How many days do I have to return an unopened item?"
+metadata:
+  mock_responses:
+    - "Returns are accepted within 90 days."
+assertions:
+  - type: contains
+    value: 30 days
+    weight: 1.0
+tags:
+  - reliability
