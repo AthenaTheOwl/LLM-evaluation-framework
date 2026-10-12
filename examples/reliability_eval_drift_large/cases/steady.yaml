@@ -1,0 +1,12 @@
+id: steady-refund-answer
+description: Now wrong on every attempt.
+prompt: "Can I get a refund on an order that arrived damaged?"
+metadata:
+  mock_responses:
+    - "Damaged orders can only be exchanged."
+assertions:
+  - type: contains
+    value: full refund
+    weight: 1.0
+tags:
+  - reliability

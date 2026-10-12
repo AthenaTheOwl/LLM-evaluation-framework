@@ -85,6 +85,12 @@ class EvalRunner:
         result = self._build_suite_result([attempts[0] for attempts in attempts_by_case])
         if self.repeats > 1:
             result.reliability = self._reliability(attempts_by_case)
+            result.attempt_scores = [
+                self._build_suite_result(
+                    [attempts[i] for attempts in attempts_by_case if i < len(attempts)]
+                ).aggregate_scores
+                for i in range(self.repeats)
+            ]
         return result
 
     def _run_attempts(self, case: EvalCase) -> list[EvalCaseResult]:

@@ -54,6 +54,14 @@ Reliability over 3 attempts
 
 pass@1 is the first attempt, pass@k is any attempt, and pass^k is every attempt. Add `--min-pass-hat-k 1.0` to exit 1 when any case is not reliable. The mock provider replays each case's `metadata.mock_responses` in order, one per attempt, so the fixture needs no API key.
 
+With `--repeat`, a baseline comparison shows how much scores varied between runs next to each change, and calls a drop smaller than that variation within noise rather than a regression. `--save-baseline` stores each attempt's scores and their spread (max minus min); a later `--compare-baseline` flags a regression only when the drop exceeds the regression tolerance plus the larger of the two spreads. Max minus min over a few attempts is a crude measure and widens the band where nothing counts as a regression; the tolerance stays as the lower limit. Baselines saved without `--repeat` compare as before.
+
+```bash
+llm-evals run examples/reliability_eval --stage deterministic --provider mock --repeat 3 --save-baseline
+llm-evals run examples/reliability_eval_drift_small --stage deterministic --provider mock --repeat 3 --compare-baseline --fail-on-regression  # within_noise, exit 0
+llm-evals run examples/reliability_eval_drift_large --stage deterministic --provider mock --repeat 3 --compare-baseline --fail-on-regression  # regression, exit 1
+```
+
 ## Live demo
 
 This repo ships a Streamlit wrapper for the same local runner.
