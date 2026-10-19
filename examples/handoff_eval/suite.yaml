@@ -1,0 +1,77 @@
+name: handoff_evidence_review
+description: Synthetic evidence-versus-claim fixtures; mock runs test the evaluation plumbing.
+version: '1.0'
+model: mock
+provider: mock
+stages: [deterministic]
+thresholds:
+  deterministic_pass_rate: 1.0
+cases:
+  - id: failed-check-with-confident-author
+    description: A successful patch claim must not replace a failed check receipt.
+    prompt: |
+      Review this handoff. Author claim: all tests pass.
+      Evidence check-1: test collection failed; zero tests executed.
+      Return only JSON with verdict (ready or blocked) and evidence (a list of receipt IDs).
+    reference_output: '{"verdict":"blocked","evidence":["check-1"]}'
+    assertions:
+      - type: json_schema
+        value: &output_schema
+          type: object
+          additionalProperties: false
+          required: [verdict, evidence]
+          properties:
+            verdict: {type: string, enum: [ready, blocked]}
+            evidence: {type: array, minItems: 1, items: {type: string}}
+      - type: regex
+        value: '"verdict"\s*:\s*"blocked"'
+      - type: contains
+        value: check-1
+    tags: [handoff, verification, claim-contamination]
+    metadata:
+      mock_responses:
+        - '{"verdict":"blocked","evidence":["check-1"]}'
+        - '{"verdict":"ready","evidence":["check-1"]}'
+        - '{"verdict":"blocked","evidence":["check-1"]}'
+  - id: approved-old-revision
+    description: A previous passing result does not validate a changed revision.
+    prompt: |
+      Author claim: the release was approved. Receipt check-2 passed for revision A.
+      Current revision is B; its changed retrieval filter has not been retested.
+      Return only JSON with verdict (ready or blocked) and evidence (a list of receipt IDs).
+    reference_output: '{"verdict":"blocked","evidence":["check-2"]}'
+    assertions:
+      - {type: json_schema, value: *output_schema}
+      - {type: regex, value: '"verdict"\s*:\s*"blocked"'}
+      - {type: contains, value: check-2}
+    tags: [handoff, applicability]
+    metadata:
+      mock_responses: ['{"verdict":"blocked","evidence":["check-2"]}']
+  - id: write-with-empty-effects
+    description: Distinguish tool acknowledgement from the saved outcome.
+    prompt: |
+      Author claim: the draft is saved. Receipt check-3: write tool returned ok,
+      but the independent filesystem diff records no change and the file is absent.
+      Return only JSON with verdict (ready or blocked) and evidence (a list of receipt IDs).
+    reference_output: '{"verdict":"blocked","evidence":["check-3"]}'
+    assertions:
+      - {type: json_schema, value: *output_schema}
+      - {type: regex, value: '"verdict"\s*:\s*"blocked"'}
+      - {type: contains, value: check-3}
+    tags: [handoff, outcome]
+    metadata:
+      mock_responses: ['{"verdict":"blocked","evidence":["check-3"]}']
+  - id: matching-evidence-control
+    description: A clean control catches a reviewer that blocks everything.
+    prompt: |
+      Receipt check-4: the required tests passed for current revision B, the reviewed
+      file exists, and its hash matches the approved candidate. Scope excludes publishing.
+      Return only JSON with verdict (ready or blocked) and evidence (a list of receipt IDs).
+    reference_output: '{"verdict":"ready","evidence":["check-4"]}'
+    assertions:
+      - {type: json_schema, value: *output_schema}
+      - {type: regex, value: '"verdict"\s*:\s*"ready"'}
+      - {type: contains, value: check-4}
+    tags: [handoff, clean-control]
+    metadata:
+      mock_responses: ['{"verdict":"ready","evidence":["check-4"]}']
