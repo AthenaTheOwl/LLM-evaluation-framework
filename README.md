@@ -31,6 +31,11 @@ Validate the checked-in suites without running models:
 llm-evals validate eval_suites
 ```
 
+The [handoff evaluation example](examples/handoff_eval/README.md) adds an offline
+reviewer exercise covering failed verification, stale approval, missing effects,
+and a clean control. Its deliberately intermittent mock verdict shows why a
+passing first attempt can still fail the repeated-run reliability gate.
+
 Run the API-free quickstart fixture and write a JSON report:
 
 ```bash
