@@ -5,7 +5,7 @@ write effect, and a matching clean control. Each answer must name a receipt and
 give the expected readiness verdict. The first case deliberately changes its mock
 verdict on attempt two.
 
-```powershell
+```bash
 llm-evals validate examples/handoff_eval
 llm-evals run examples/handoff_eval --provider mock --stage deterministic --repeat 3 --min-pass-hat-k 1.0
 ```
