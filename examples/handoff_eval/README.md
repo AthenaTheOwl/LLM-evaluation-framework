@@ -21,7 +21,6 @@ budget and grader fixed; record changed verdicts, false blocks, time and total
 cost including retries. Use held-out cases before adopting a prompt change.
 
 This local experiment design follows the question raised by
-[Audit Without Verification](https://arxiv.org/abs/2609.07680). The revision case
-also applies [AI Product Team's change workflow](https://github.com/3orionkings/ai-product-team/blob/main/workflows/process-change.md).
+[Audit Without Verification](https://arxiv.org/abs/2609.07680).
 The exact-string receipts here cannot establish factual support in free text or
 replace independent human labels. Keep those claims separate from fixture pass rate.
