@@ -11,8 +11,9 @@ llm-evals run examples/handoff_eval --provider mock --stage deterministic --repe
 ```
 
 The repeated mock run should exit 1: first-attempt and any-attempt success are
-100%, while all-attempt reliability is 75%. This checks reporting and regression
-plumbing. It provides no measurement of a real model's review ability.
+100%, while all-attempt reliability is 75%. This checks reporting and the
+repeated-run reliability gate. It provides no measurement of a real model's
+review ability.
 
 For a later authorized model experiment, hold the raw task and receipts fixed.
 Compare a reviewer that receives the author's conclusion immediately with one
