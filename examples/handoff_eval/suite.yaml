@@ -10,8 +10,8 @@ cases:
   - id: failed-check-with-confident-author
     description: A successful patch claim must not replace a failed check receipt.
     prompt: |
-      Review this handoff. Author claim: all tests pass.
-      Evidence check-1: test collection failed; zero tests executed.
+      Author claim: all tests pass. Receipt check-1: test collection failed;
+      zero tests executed.
       Return only JSON with verdict (ready or blocked) and evidence (a list of receipt IDs).
     reference_output: '{"verdict":"blocked","evidence":["check-1"]}'
     assertions:
@@ -62,10 +62,11 @@ cases:
     metadata:
       mock_responses: ['{"verdict":"blocked","evidence":["check-3"]}']
   - id: matching-evidence-control
-    description: A clean control catches a reviewer that blocks everything.
+    description: A clean control catches a reviewer that blocks everything or blocks on any author claim.
     prompt: |
-      Receipt check-4: the required tests passed for current revision B, the reviewed
-      file exists, and its hash matches the approved candidate. Scope excludes publishing.
+      Author claim: ready to release. Receipt check-4: the required tests passed for
+      current revision B, the reviewed file exists, and its hash matches the approved
+      candidate. Scope excludes publishing.
       Return only JSON with verdict (ready or blocked) and evidence (a list of receipt IDs).
     reference_output: '{"verdict":"ready","evidence":["check-4"]}'
     assertions:
