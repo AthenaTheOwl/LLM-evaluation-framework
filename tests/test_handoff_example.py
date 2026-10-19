@@ -35,7 +35,9 @@ def test_handoff_example_fails_reliability_gate_as_documented():
     )
 
     assert result.exit_code == 1, result.output
+    assert isinstance(result.exception, SystemExit), result.exception
     plain = re.sub(r"\x1b\[[0-9;]*m", "", result.output)
+    assert "pass^3 75% is below 100% -- exiting with code 1" in plain
     assert "pass@1 100%" in plain
     assert "pass@3 100%" in plain
     assert "pass^3 75%" in plain
